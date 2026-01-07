@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Réduction des Primes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Calculateur de Réduction des Primes</h1>
+            <p>Estimez votre droit à une réduction des primes d'assurance-maladie pour le canton de Fribourg.</p>
+        </header>
+
+        <main>
+            <div class="calculator">
+                <!-- Section Situation Personnelle -->
+                <section class="input-section">
+                    <h2><span class="section-number">1</span>Situation Personnelle</h2>
+                    <div class="form-row">
+                        <label for="annee-calcul">Année de calcul</label>
+                        <input type="text" id="annee-calcul" value="2026" min="2020">
+                        <span class="help-tooltip" data-tooltip="Année pour laquelle la réduction est calculée. Les données de base (primes, etc.) seront chargées pour cette année.">?</span>
+                    </div>
+                    <div class="form-row">
+                        <label for="statut-civil">Statut civil</label>
+                        <select id="statut-civil">
+                            <option value="single">Célibataire / Divorcé(e) / Veuf(ve) / Séparé(e)</option>
+                            <option value="married">Couple marié</option>
+                        </select>
+                        <span class="help-tooltip" data-tooltip="Sélectionnez votre état civil actuel.">?</span>
+                    </div>
+                    <div class="form-row">
+                        <label for="region">Région</label>
+                        <select id="region">
+                            <option value="1">Région 1 (Sarine)</option>
+                            <option value="2">Région 2 (Autres districts)</option>
+                        </select>
+                        <span class="help-tooltip" data-tooltip="La prime moyenne varie selon la région de domicile.">?</span>
+                    </div>
+                    <div class="form-row">
+                        <label for="nombre-adultes">Nombre d'adultes (>25 ans)</label>
+                        <input type="text" id="nombre-adultes" value="0" min="0">
+                        <span class="help-tooltip" data-tooltip="Nombre d'adultes de plus de 25 ans dans le ménage.">?</span>
+                    </div>
+                    <div class="form-row">
+                        <label for="nombre-jeunes">Nombre de jeunes adultes (19-25 ans)</label>
+                        <input type="text" id="nombre-jeunes" value="0" min="0">
+                        <span class="help-tooltip" data-tooltip="Nombre de jeunes adultes en formation entre 19 et 25 ans.">?</span>
+                    </div>
+                    <div class="form-row">
+                        <label for="nombre-enfants">Nombre d'enfants (0-18 ans)</label>
+                        <input type="text" id="nombre-enfants" value="0" min="0">
+                        <span class="help-tooltip" data-tooltip="Nombre d'enfants jusqu'à 18 ans.">?</span>
+                    </div>
+                </section>
+
+                <!-- Section Revenu Déterminant -->
+                <section class="input-section">
+                    <h2><span class="section-number">2</span>Calcul du Revenu Déterminant</h2>
+                    <p class="section-intro">Saisissez les montants de votre taxation fiscale 2024. Pour chaque champ, la valeur utilisée pour le calcul (valeur déterminante) est affichée.</p>
+                    
+                    <table class="determinant-table">
+                        <thead>
+                            <tr>
+                                <th>Rubrique</th>
+                                <th>Code</th>
+                                <th>Votre Valeur (CHF)</th>
+                                <th>Op.</th>
+                                <th>Valeur Déterminante</th>
+                                <th>Aide</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Revenu Net -->
+                            <tr>
+                                <td>Revenu net</td>
+                                <td>4.910</td>
+                                <td><input type="text" id="revenu-net" placeholder="0"></td>
+                                <td class="operator plus">+</td>
+                                <td class="determinant-value" id="determinant-revenu-net">0 CHF</td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Revenu net selon votre dernière taxation fiscale.">?</span></td>
+                            </tr>
+                            <!-- Primes caisse-maladie et accidents -->
+                            <tr>
+                                <td>Primes caisse-maladie et accidents</td>
+                                <td>4.110</td>
+                                <td><input type="text" id="caisse-maladie" placeholder="0"></td>
+                                <td class="operator plus">+</td>
+                                <td class="determinant-value" id="determinant-caisse-maladie">0 CHF</td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Montant de vos primes LAMal et LAA.">?</span></td>
+                            </tr>
+                            <!-- Réduction de prime -->
+                            <tr>
+                                <td>Réduction de prime</td>
+                                <td>4.115</td>
+                                <td><input type="text" id="reduction-prime" placeholder="0"></td>
+                                <td class="operator minus">-</td>
+                                <td class="determinant-value" id="determinant-reduction-prime">0 CHF</td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Montant de la réduction de prime déjà reçue ou attendue. Ce montant est déduit du revenu déterminant.">?</span></td>
+                            </tr>
+                            <!-- Autres primes et cotisations (pilier 3b) -->
+                            <tr>
+                                <td>Autres primes et cotisations (3b)</td>
+                                <td>4.120</td>
+                                <td><input type="text" id="autres-primes" placeholder="0"></td>
+                                <td class="operator plus">+</td>
+                                <td class="determinant-value" id="determinant-autres-primes">0 CHF</td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Primes d'assurances vie et rentes (pilier 3b).">?</span></td>
+                            </tr>
+                            <!-- Prévoyance liée (pilier 3a) conjoint -->
+                            <tr>
+                                <td>Prévoyance liée (3a) conjoint</td>
+                                <td>4.130</td>
+                                <td><input type="text" id="prevoyance-conjoint" placeholder="0"></td>
+                                <td class="operator plus">+</td>
+                                <td class="determinant-value" id="determinant-prevoyance-conjoint">0 CHF</td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Cotisations au 3ème pilier A pour le premier conjoint.">?</span></td>
+                            </tr>
+                            <!-- Prévoyance liée (pilier 3a) conjointe -->
+                            <tr>
+                                <td>Prévoyance liée (3a) conjointe</td>
+                                <td>4.130</td>
+                                <td><input type="text" id="prevoyance-conjointe" placeholder="0"></td>
+                                <td class="operator plus">+</td>
+                                <td class="determinant-value" id="determinant-prevoyance-conjointe">0 CHF</td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Cotisations au 3ème pilier A pour la seconde conjointe.">?</span></td>
+                            </tr>
+                            <!-- Rachat d'années d'assurance (2ème pilier) -->
+                            <tr>
+                                <td>Rachat d'années d'assurance (2e pilier)</td>
+                                <td>4.140</td>
+                                <td><input type="text" id="rachat-assurance" placeholder="0"></td>
+                                <td class="operator plus">+</td>
+                                <td class="determinant-value" id="determinant-rachat-assurance">0 CHF</td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Rachats d'années LPP. La part excédant 15'000 CHF est ajoutée.">?</span></td>
+                            </tr>
+                            <!-- Intérêts passifs privés -->
+                            <tr>
+                                <td>Intérêts passifs privés</td>
+                                <td>4.210</td>
+                                <td><input type="text" id="interets-passifs" placeholder="0"></td>
+                                <td class="operator plus">+</td>
+                                <td class="determinant-value" id="determinant-interets-passifs">0 CHF</td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Seule la part des intérêts qui dépasse 30'000 CHF est ajoutée.">?</span></td>
+                            </tr>
+                            <!-- Frais d'entretien d'immeubles privés -->
+                            <tr>
+                                <td>Frais d'entretien d'immeubles</td>
+                                <td>4.310</td>
+                                <td><input type="text" id="frais-immeubles" placeholder="0"></td>
+                                <td class="operator plus">+</td>
+                                <td class="determinant-value" id="determinant-frais-immeubles">0 CHF</td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Seule la part des frais qui dépasse 15'000 CHF est ajoutée.">?</span></td>
+                            </tr>
+                            <!-- Fortune imposable -->
+                            <tr>
+                                <td>Fortune imposable</td>
+                                <td>7.910</td>
+                                <td><input type="text" id="fortune-imposable" placeholder="0"></td>
+                                <td class="operator plus">+</td>
+                                <td class="determinant-value" id="determinant-fortune-imposable">0 CHF</td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="1/20ème de la fortune est ajouté. Une fortune négative est comptée comme 0.">?</span></td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="total-label">Total du Revenu Déterminant</td>
+                                <td class="total-value" id="total-determinant-sum">0 CHF</td>
+                                <td class="cell-help"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div class="calculate-button-container">
+                        <button id="calculate-btn">Calculer</button>
+                    </div>
+                    <div class="storage-button-container">
+                        <button id="print-btn">Imprimer</button>
+                        <button id="save-btn">Sauvegarder localement</button>
+                        <button id="load-btn">Charger les données</button>
+                    </div>
+                </section>
+
+                <!-- Section Résultats -->
+                <section class="results-section">
+                    <h2><span class="section-number">3</span>Résultats Estimés</h2>
+                    <div class="result-box">
+                        <div class="result-item">
+                            <span class="result-label">Limite de revenu pour votre situation:</span>
+                            <span class="result-value" id="limite-revenu">...</span>
+                            <span class="help-tooltip" data-tooltip="La limite de revenu est déterminée par votre statut civil et le nombre d'enfants à charge.">?</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Votre Revenu Déterminant Calculé:</span>
+                            <span class="result-value" id="revenu-determinant-calcule">...</span>
+                            <span class="help-tooltip" data-tooltip="Ceci est la somme de toutes les 'Valeurs Déterminantes' de la section 2.">?</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Différence en valeur:</span>
+                            <span class="result-value" id="diff-valeur">...</span>
+                            <span class="help-tooltip" data-tooltip="= Limite de revenu - Votre revenu déterminant. Si ce montant est négatif, vous n'avez pas droit à une réduction.">?</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Différence en %:</span>
+                            <span class="result-value" id="diff-percent">...</span>
+                            <span class="help-tooltip" data-tooltip="= (Différence en valeur / Limite de revenu) * 100. Ce pourcentage est utilisé pour trouver le taux de réduction applicable.">?</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Taux de réduction applicable:</span>
+                            <span class="result-value" id="taux-reduction-applicable">...</span>
+                            <span class="help-tooltip" data-tooltip="Le taux de réduction pour les adultes, trouvé dans la grille officielle en fonction de la 'Différence en %'.">?</span>
+                        </div>
+                        <div class="result-item final-result">
+                            <span class="result-label">Droit à la réduction estimé:</span>
+                            <span class="result-value" id="droit-reduction">...</span>
+                            <span class="help-tooltip" data-tooltip="Indique si votre revenu déterminant est inférieur à la limite de revenu.">?</span>
+                        </div>
+                         <div class="result-item final-result">
+                            <span class="result-label">Estimation de la réduction (annuel):</span>
+                         </div>
+                         <table class="reduction-breakdown-table">
+                            <thead>
+                                <tr>
+                                    <th>Groupe</th>
+                                    <th>Prime Moyenne (mensuel)</th>
+                                    <th>Pourcentage</th>
+                                    <th>Réduction (annuel)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="breakdown-body">
+                                <!-- Rows will be generated by script.js -->
+                            </tbody>
+                            <tfoot id="breakdown-foot">
+                                <!-- Total row will be generated by script.js -->
+                            </tfoot>
+                         </table>
+                    </div>
+                    <p class="disclaimer">Ce calcul est une estimation. La décision officielle est communiquée par la Caisse de compensation du canton de Fribourg.</p>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

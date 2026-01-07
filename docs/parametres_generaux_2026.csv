@@ -1,0 +1,13 @@
+key,value
+annee_calcul,2026
+pm_adulte_reg1,569
+pm_jeune_reg1,415
+pm_enfant_reg1,136
+pm_adulte_reg2,524
+pm_jeune_reg2,386
+pm_enfant_reg2,124
+taux_reduction_jeune,50
+taux_reduction_enfant,80
+franchise_rachat_lpp,15000
+franchise_interets_passifs,30000
+franchise_frais_immeubles,15000
