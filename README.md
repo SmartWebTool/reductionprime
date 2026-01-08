@@ -1,39 +1,110 @@
-# Calculateur de Réduction des Primes - Canton de Fribourg
+# Calculateur de réduction des primes d’assurance-maladie (LAMal)
 
-## Objectif de l'outil
+## Contexte général
 
-Ce projet est une application web monopage (Single Page Application) qui permet aux citoyens du canton de Fribourg d'estimer leur droit à une réduction des primes d'assurance-maladie pour l'année 2026.
+En Suisse, l’assurance-maladie de base selon la **LAMal** est obligatoire pour l’ensemble de la population.  
+Les primes étant indépendantes du revenu, un mécanisme public de **réduction des primes d’assurance-maladie** (*RPI – Réduction des Primes Individuelles*) a été mis en place afin de soutenir les personnes et les familles disposant de moyens financiers modestes.
 
-Le calcul est basé sur les directives officielles de la Caisse de compensation du canton de Fribourg (ECAS), telles que décrites dans le mémento RPI 2026.
+Ce mécanisme est prévu par le droit fédéral, mais sa mise en œuvre concrète relève des **cantons**, qui définissent :
+- les critères d’éligibilité,
+- les seuils de revenu,
+- les méthodes de calcul,
+- les primes de référence,
+- ainsi que les modalités administratives.
 
-**Lien vers le calculateur :** [Accéder au calculateur](https://[votre-nom-utilisateur-github].github.io/primereduction/docs/index.html) *(Note: remplacez `[votre-nom-utilisateur-github]` par votre nom d'utilisateur pour que le lien fonctionne après déploiement sur GitHub Pages).*
+Ces règles varient donc selon le canton et selon l’année de référence.
 
-## Comment ça marche ?
+---
 
-Ce calculateur a été conçu pour être simple, transparent et sécurisé.
+## Cadre légal de référence
 
-*   **100% Côté Client :** Toutes les opérations sont effectuées directement dans votre navigateur web. Aucune donnée personnelle n'est envoyée, stockée ou partagée sur un serveur. Votre vie privée est entièrement respectée.
-*   **Transparence des Calculs :** Pour chaque valeur que vous entrez, l'application vous montre immédiatement la "valeur déterminante" — c'est-à-dire la valeur qui est réellement utilisée dans le calcul final du revenu déterminant. Cela vous permet de comprendre précisément comment le résultat est obtenu.
-*   **Technologie :** L'application est développée en utilisant uniquement des technologies web standard : HTML, CSS et JavaScript (vanilla), sans dépendre de frameworks complexes.
+Ce calculateur est basé sur le cadre juridique applicable dans le **canton de Fribourg**, notamment :
 
-## Comment utiliser le calculateur
+- La **Loi fédérale sur l’assurance-maladie (LAMal)**, qui établit le principe d’une réduction des primes pour les personnes de condition économique modeste.
+- La **Loi cantonale d’application de la LAMal (LALAMal)**, qui précise :
+  - les conditions d’octroi,
+  - la notion de *revenu déterminant*,
+  - les exclusions (revenu ou fortune élevés, taxation d’office, etc.),
+  - le rôle de la Caisse cantonale de compensation.
+- Le **mémento cantonal officiel pour l’année 2026**, qui détaille :
+  - les limites de revenu selon la composition du ménage,
+  - les règles de calcul du revenu déterminant,
+  - les primes moyennes régionales par âge,
+  - les taux de réduction applicables, y compris les minimums garantis pour les enfants et les jeunes adultes en formation.
 
-1.  **Ouvrez le fichier `docs/index.html`** dans votre navigateur ou accédez au lien GitHub Pages.
-2.  **Remplissez les champs** en vous basant sur les informations de votre **avis de taxation fiscale de 2024**.
-3.  Utilisez les icônes d'aide (`?`) à côté de chaque champ pour obtenir des explications sur la valeur à saisir.
-4.  **Les résultats sont mis à jour automatiquement** à chaque modification. La section "Résultats Estimés" vous indiquera :
-    *   La limite de revenu pour votre situation.
-    *   Votre revenu déterminant calculé.
-    *   Une estimation de votre droit à la réduction (Oui/Non).
-    *   Le montant annuel estimé de la réduction.
+Seules les autorités compétentes peuvent rendre des décisions juridiquement contraignantes.  
+Ce calculateur a une **finalité informative**.
+
+---
+
+## Objectif du calculateur
+
+Le système de réduction des primes repose sur des règles publiques, mais souvent **complexes et dispersées** entre textes légaux, ordonnances et documents explicatifs annuels.
+
+Ce calculateur a été conçu pour :
+
+- fournir une **estimation claire et compréhensible** du droit potentiel à une réduction de primes ;
+- permettre à l’utilisateur de savoir s’il est **susceptible d’être éligible** ;
+- expliquer **la logique du calcul**, et pas uniquement le résultat final ;
+- réduire l’incertitude avant le dépôt d’une demande officielle.
+
+Il s’agit d’un **outil d’aide à la décision et de compréhension**, et non d’un substitut aux procédures administratives officielles.
+
+---
+
+## Principe de calcul (vue d’ensemble)
+
+Le calculateur applique, de manière simplifiée mais fidèle, la méthodologie cantonale officielle :
+
+- prise en compte de la **situation du ménage** (personne seule, couple, nombre d’enfants à charge) ;
+- détermination du **revenu déterminant**, basée sur :
+  - le revenu fiscal net de l’année *N–2*,
+  - des ajustements selon le statut fiscal (imposition ordinaire, indépendant, impôt à la source),
+  - l’ajout d’une fraction de la fortune imposable ;
+- comparaison avec les **seuils légaux** applicables ;
+- application des **taux de réduction** définis par les barèmes cantonaux ;
+- utilisation des **primes moyennes régionales officielles** selon l’âge (adulte, jeune adulte, enfant).
+
+L’ensemble des calculs est effectué **côté client**, au moyen de **HTML, CSS et JavaScript**, sans transmission de données à un serveur.
+
+---
+
+## Portée et limites
+
+Ce calculateur :
+
+- s’applique à **un canton et une année de référence donnés** ;
+- repose exclusivement sur des **sources légales et administratives publiques** ;
+- fournit des **estimations**, non des décisions officielles ;
+- ne remplace pas l’examen effectué par la Caisse cantonale de compensation ;
+- ne collecte ni ne conserve aucune donnée personnelle.
+
+Le droit effectif à une réduction de primes et son montant final sont toujours déterminés par l’autorité compétente.
+
+---
+
+## Pourquoi ce projet
+
+La réduction des primes est un mécanisme social essentiel. Pourtant, de nombreuses personnes :
+- ne déposent pas de demande par manque de compréhension,
+- sous-estiment leur droit,
+- découvrent trop tard qu’elles étaient éligibles.
+
+Ce projet vise à **abaisser la barrière de compréhension**, en rendant les règles lisibles, testables et explicables au moyen d’un outil web simple, ouvert et transparent.
+
+---
+
+## Aspects techniques
+
+- Application web statique
+- Technologies : HTML / CSS / JavaScript
+- Hébergement : GitHub Pages
+- Code source : open source
+- Aucune dépendance serveur
+
+---
 
 ## Avertissement
 
-Ce calculateur fournit une **estimation** et n'a aucune valeur légale. Le résultat peut différer de la décision officielle. La demande de réduction de primes doit être déposée auprès de la Caisse de compensation du canton de Fribourg, qui est la seule entité habilitée à rendre une décision officielle.
-
-Pour plus d'informations ou pour faire votre demande officielle, veuillez consulter le site de l'[ECAS](https://www.ecasfr.ch/).
-
-## Structure du Projet
-
-*   `/docs` : Contient les fichiers de l'application web (`index.html`, `style.css`, `script.js`) et les données CSV. Ce dossier est utilisé pour le déploiement sur GitHub Pages.
-*   `/sources` : Contient les documents de référence PDF qui ont servi à l'élaboration du calculateur.
+Ce calculateur est fourni à titre informatif.  
+En cas de divergence, **les dispositions légales et les décisions des autorités cantonales font foi**.
