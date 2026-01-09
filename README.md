@@ -1,4 +1,17 @@
-# Calculateur de réduction des primes d’assurance-maladie (LAMal)
+# Calculateur de réduction des primes d’assurance-maladie canton de Fribourg (LAMal)
+
+## Accès direct au calculateur
+
+<p align="left">
+  <a href="https://smartwebtool.github.io/reductionprime/">
+    <img src="IconCalculatorPrimeReduction.png" alt="Calculateur de réduction de prime" width="300">
+  </a><br>
+  <a href="https://smartwebtool.github.io/reductionprime/">
+    <em>Veuillez cliquer sur l'image pour lancer le calculator</em>
+  </a>
+</p>
+
+---
 
 ## Contexte général
 

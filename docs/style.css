@@ -446,10 +446,10 @@ select {
 @media print {
     body {
         font-size: 10pt;
-        background-color: #fff;
-        color: #000;
+        background: #fff;
         margin: 0;
         padding: 0;
+        color: #000;
     }
 
     .container {
@@ -461,133 +461,191 @@ select {
         border-radius: 0;
     }
 
-    header, .section-number, .help-tooltip, #calculate-btn, .storage-button-container, .section-intro, header p, .disclaimer, .cell-help {
+    /* Hide non-essential elements */
+    header p, .section-number, .help-tooltip, .calculate-button-container, .storage-button-container, .section-intro, .disclaimer, .cell-help {
         display: none !important;
     }
-    
-    h1 {
-        font-size: 16pt;
+
+    header h1 {
+        font-size: 18pt;
         text-align: center;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
     }
     
     h2 {
-        font-size: 12pt;
+        font-size: 14pt;
         border-bottom: 1px solid #ccc;
         padding-bottom: 5px;
-        margin-top: 15px;
+        margin-top: 20px;
     }
 
     section {
-        margin-bottom: 10px;
+        margin-bottom: 15px;
+        page-break-inside: avoid;
     }
 
-    .form-row, .result-item {
+    /* Section 1: Situation Personnelle */
+    .form-row {
         display: flex;
-        flex-direction: row;
         justify-content: space-between;
-        padding: 2px 0;
-        margin-bottom: 2px;
+        align-items: center;
+        padding: 4px 0;
+        margin-bottom: 0;
         border-bottom: 1px solid #eee;
     }
 
-    .form-row label, .result-label {
+    .form-row label {
         font-weight: bold;
-        flex-basis: 50%;
-        padding-right: 10px;
-    }
-    
-    input[type="text"], select {
-        border: none;
-        padding: 0;
-        font-size: 10pt;
-        width: auto;
-        background: transparent;
-        text-align: right;
+        flex: 1;
     }
 
-    /* Display input/select values for printing */
-    select, input[type="text"] {
+    /* Make inputs and selects look like static text */
+    input[type="text"], select {
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
         border: none;
+        padding: 0;
+        margin: 0;
+        font-size: 10pt;
+        width: auto;
         background: transparent;
-        font-family: inherit;
-        font-size: inherit;
-        color: inherit;
         text-align: right;
-        width: 100%;
+        color: #000;
         box-shadow: none;
+        font-family: inherit;
+        flex: 1;
     }
-    
-    .determinant-table, .reduction-breakdown-table {
+
+    /* Special handling for select to show the selected option */
+    select {
+       pointer-events: none;
+    }
+
+    /* Section 2: Main table */
+    .determinant-table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 10px;
     }
 
-    .determinant-table th, .determinant-table td,
-    .reduction-breakdown-table th, .reduction-breakdown-table td {
-        border: 1px solid #ccc;
-        padding: 3px 5px;
-        font-size: 9pt;
-        text-align: left;
-    }
-    
-    .determinant-table thead, .reduction-breakdown-table thead {
-        display: table-header-group; /* Ensure header displays */
-    }
-    
-    .determinant-table th {
-        background-color: #f0f0f0;
-        color: #000;
-        font-weight: bold;
-    }
-
-    .determinant-table td, .determinant-table tr, .determinant-table tbody {
-        display: table-cell;
+    /* Ensure table layout is restored from mobile styles */
+    .determinant-table, .determinant-table tbody, .determinant-table tr, .determinant-table td, .determinant-table th {
+        display: table;
+        width: 100%;
     }
     
     .determinant-table tr {
-        page-break-inside: avoid;
+        display: table-row;
+    }
+    
+    .determinant-table th, .determinant-table td {
+        display: table-cell;
+        padding: 4px 6px;
+        border: 1px solid #ccc;
+        text-align: left;
+        font-size: 9pt;
+        vertical-align: middle;
     }
 
+    .determinant-table thead {
+        display: table-header-group;
+    }
+    
+    .determinant-table thead th {
+        background-color: #f0f0f0 !important; /* Use !important to override other styles if needed */
+        color: #000;
+        font-weight: bold;
+    }
+    
+    /* Hide the input field's cell padding and align text */
+    .determinant-table td:nth-child(3) {
+        padding: 0;
+    }
+    .determinant-table td input[type="text"] {
+        padding: 4px 6px;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: right;
+    }
+    
     .determinant-value, .total-value {
         text-align: right;
         font-weight: normal;
+        background-color: #f9f9f9 !important;
     }
 
-    .operator { display: table-cell; text-align: center; }
-
-    input[type="text"] {
-        text-align: left; /* Align input text to the left in table */
+    /* Hide operator column */
+    .operator {
+        display: none;
     }
-    
+
+    .determinant-table tfoot .total-label {
+        text-align: right;
+    }
+
+    /* Section 3: Results */
     .result-box {
         border: 1px solid #ccc;
         padding: 10px;
         background: transparent;
     }
     
+    .result-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .result-label {
+        flex-grow: 1;
+    }
+
     .result-value {
         font-weight: bold;
         text-align: right;
     }
+
+    /* Breakdown Table */
+    .reduction-breakdown-table {
+        width: 100%;
+        margin-top: 15px;
+        border-collapse: collapse;
+        font-size: 9pt;
+    }
     
-    .reduction-breakdown-table,
-    .reduction-breakdown-table tbody, 
-    .reduction-breakdown-table tr, 
-    .reduction-breakdown-table td {
+    .reduction-breakdown-table, .reduction-breakdown-table tbody, .reduction-breakdown-table tr, .reduction-breakdown-table td, .reduction-breakdown-table th {
         display: table;
         width: 100%;
     }
     
-    .reduction-breakdown-table td {
+    .reduction-breakdown-table tr {
+        display: table-row;
+    }
+    
+    .reduction-breakdown-table th, .reduction-breakdown-table td {
         display: table-cell;
+        padding: 4px 6px;
+        border: 1px solid #ccc;
+        text-align: right;
     }
     
     .reduction-breakdown-table thead {
         display: table-header-group;
+    }
+    
+    .reduction-breakdown-table th {
+        background-color: #f0f0f0 !important;
+        font-weight: bold;
+    }
+    
+    .reduction-breakdown-table td:first-child {
+        text-align: left;
+    }
+
+    .reduction-breakdown-table tfoot td {
+        border-top: 2px solid #000;
+        font-weight: bold;
     }
 }
