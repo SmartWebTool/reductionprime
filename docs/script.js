@@ -288,17 +288,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initialization ---
     const init = async () => {
-        const dataLoadedFromStorage = loadData();
-
         await handleDataLoadingAndRecalculate();
 
-        if (dataLoadedFromStorage) {
-            updateDeterminantTable();
-            calculateResults();
-        } else {
-             resetResults();
-             updateDeterminantTable();
-        }
+        resetResults();
+        updateDeterminantTable();
 
         // Attach event listeners
         Object.values(elements).forEach(el => {
@@ -307,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(el.id === 'annee-calcul') {
                     el.addEventListener('change', handleDataLoadingAndRecalculate);
                 } else {
-                    el.addEventListener('input', updateDeterminantTable);
+                    el.addEventListener('input', calculateResults);
                 }
             }
         });
