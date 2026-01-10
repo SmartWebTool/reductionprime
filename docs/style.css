@@ -469,18 +469,19 @@ select {
     header h1 {
         font-size: 18pt;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 15px; /* Reduced margin */
     }
     
     h2 {
         font-size: 14pt;
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 5px;
-        margin-top: 20px;
+        border-bottom: none; /* Removed line */
+        padding-bottom: 0;   /* Removed padding */
+        margin-top: 15px;     /* Reduced margin */
+        margin-bottom: 5px;   /* Added for spacing before content */
     }
 
     section {
-        margin-bottom: 15px;
+        margin-bottom: 10px; /* Reduced margin */
         page-break-inside: avoid;
     }
 
@@ -490,7 +491,7 @@ select {
         flex-direction: row !important;
         justify-content: space-between;
         align-items: center;
-        padding: 4px 0;
+        padding: 2px 0; /* Reduced padding */
         margin-bottom: 0 !important; /* Override responsive style */
         border-bottom: 1px solid #eee;
     }
@@ -529,7 +530,7 @@ select {
         display: table !important;
         width: 100% !important;
         border-collapse: collapse !important;
-        margin-top: 10px;
+        margin-top: 5px; /* Reduced margin */
     }
 
     .determinant-table thead, .reduction-breakdown-table thead {
@@ -552,7 +553,7 @@ select {
         display: table-cell !important;
         width: auto !important; /* Let table decide width */
         border: 1px solid #ccc !important;
-        padding: 4px 6px !important;
+        padding: 2px 6px !important; /* Reduced vertical padding */
         font-size: 9pt !important;
         vertical-align: middle !important;
         text-align: left !important;
@@ -576,7 +577,7 @@ select {
     
     /* Input field styling */
     .determinant-table td input[type="text"] {
-        padding: 4px 6px !important;
+        padding: 2px 6px !important; /* Reduced vertical padding */
         width: 100% !important;
         max-width: none !important;
         box-sizing: border-box !important;
@@ -619,7 +620,7 @@ select {
     .result-item {
         display: flex !important;
         justify-content: space-between;
-        padding: 4px 0;
+        padding: 2px 0; /* Reduced padding */
         border-bottom: 1px solid #eee;
     }
 
