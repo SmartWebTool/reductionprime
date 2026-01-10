@@ -278,7 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if(success) {
-            updateDeterminantTable();
             calculateResults();
         } else {
              alert(`Erreur critique: Impossible de charger les données de base, même pour l'année de référence ${DEFAULT_YEAR}. Le calculateur ne peut pas fonctionner.`);
@@ -289,9 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Initialization ---
     const init = async () => {
         await handleDataLoadingAndRecalculate();
-
-        resetResults();
-        updateDeterminantTable();
 
         // Attach event listeners
         Object.values(elements).forEach(el => {
