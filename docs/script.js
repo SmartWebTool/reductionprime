@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         determinantElements.prevoyanceConjointe.textContent = formatCurrency(inputs.prevoyanceConjointe);
 
 
-        const totalDeterminant = Object.values(determinants).reduce((sum, value) => sum + value, 0) - determinants.reductionPrime;
+        const totalDeterminant = Object.values(determinants).reduce((sum, value) => sum + value, 0) - (determinants.reductionPrime * 2);
         resultElements.totalDeterminantSum.textContent = formatCurrency(totalDeterminant);
         return totalDeterminant;
     };
