@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(el.id === 'annee-calcul') {
                     el.addEventListener('change', handleDataLoadingAndRecalculate);
                 } else {
-                    el.addEventListener('input', calculateResults);
+                    el.addEventListener('input', updateDeterminantTable);
                 }
             }
         });
