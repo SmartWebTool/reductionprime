@@ -142,11 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const determinants = {
             revenuNet: inputs.revenuNet,
-            caisseMaladie: inputs.caisseMaladie,
-            autresPrimes: inputs.autresPrimes,
-            prevoyanceConjoint: inputs.prevoyanceConjoint,
-            prevoyanceConjointe: inputs.prevoyanceConjointe,
-            reductionPrime: inputs.reductionPrime,
+            caisseMaladie: Math.max(0, inputs.caisseMaladie),
+            autresPrimes: Math.max(0, inputs.autresPrimes),
+            prevoyanceConjoint: Math.max(0, inputs.prevoyanceConjoint),
+            prevoyanceConjointe: Math.max(0, inputs.prevoyanceConjointe),
+            reductionPrime: Math.max(0, inputs.reductionPrime),
             rachatAssurance: Math.max(0, inputs.rachatAssurance - config.franchise_rachat_lpp),
             interetsPassifs: Math.max(0, inputs.interetsPassifs - config.franchise_interets_passifs),
             fraisImmeubles: Math.max(0, inputs.fraisImmeubles - config.franchise_frais_immeubles),
