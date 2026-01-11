@@ -144,12 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
             revenuNet: inputs.revenuNet,
             caisseMaladie: inputs.caisseMaladie,
             autresPrimes: inputs.autresPrimes,
-            prevoyance: inputs.prevoyanceConjoint + inputs.prevoyanceConjointe,
+            prevoyanceConjoint: inputs.prevoyanceConjoint,
+            prevoyanceConjointe: inputs.prevoyanceConjointe,
             reductionPrime: inputs.reductionPrime,
-            rachat: Math.max(0, inputs.rachatAssurance - config.franchise_rachat_lpp),
-            interets: Math.max(0, inputs.interetsPassifs - config.franchise_interets_passifs),
-            frais: Math.max(0, inputs.fraisImmeubles - config.franchise_frais_immeubles),
-            fortune: Math.max(0, inputs.fortune) / 20,
+            rachatAssurance: Math.max(0, inputs.rachatAssurance - config.franchise_rachat_lpp),
+            interetsPassifs: Math.max(0, inputs.interetsPassifs - config.franchise_interets_passifs),
+            fraisImmeubles: Math.max(0, inputs.fraisImmeubles - config.franchise_frais_immeubles),
+            fortuneImposable: Math.max(0, inputs.fortune) / 20,
         };
 
         Object.keys(determinantElements).forEach(key => {
@@ -157,9 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
                  determinantElements[key].textContent = formatCurrency(determinants[key] || 0);
             }
         });
-        determinantElements.prevoyanceConjoint.textContent = formatCurrency(inputs.prevoyanceConjoint);
-        determinantElements.prevoyanceConjointe.textContent = formatCurrency(inputs.prevoyanceConjointe);
-
 
         const totalDeterminant = Object.values(determinants).reduce((sum, value) => sum + value, 0) - (determinants.reductionPrime * 2);
         resultElements.totalDeterminantSum.textContent = formatCurrency(totalDeterminant);
