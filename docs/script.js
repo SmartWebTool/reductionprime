@@ -114,8 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Core Functions ---
     const resetResults = () => {
         Object.values(resultElements).forEach(el => {
+            if (!el) return;
             if (el.tagName === 'TBODY' || el.tagName === 'TFOOT') el.innerHTML = '';
-            else if(el) {
+            else {
                 el.textContent = '...';
                 el.classList.remove('negative-value');
             }
@@ -148,10 +149,10 @@ document.addEventListener('DOMContentLoaded', () => {
             prevoyanceConjoint: Math.max(0, inputs.prevoyanceConjoint),
             prevoyanceConjointe: Math.max(0, inputs.prevoyanceConjointe),
             reductionPrime: Math.max(0, inputs.reductionPrime),
-            rachatAssurance: Math.max(0, inputs.rachatAssurance - config.franchise_rachat_lpp),
-            interetsPassifs: Math.max(0, inputs.interetsPassifs - config.franchise_interets_passifs),
-            fraisImmeubles: Math.max(0, inputs.fraisImmeubles - config.franchise_frais_immeubles),
-            fortuneImposable: Math.max(0, inputs.fortune) / 20, // FIX: Fortune can't be negative for determinant value
+            rachatAssurance: Math.max(0, inputs.rachatAssurance - (config.franchise_rachat_lpp || 0)),
+            interetsPassifs: Math.max(0, inputs.interetsPassifs - (config.franchise_interets_passifs || 0)),
+            fraisImmeubles: Math.max(0, inputs.fraisImmeubles - (config.franchise_frais_immeubles || 0)),
+            fortuneImposable: Math.max(0, inputs.fortune) / 20,
         };
 
         Object.keys(determinantElements).forEach(key => {
@@ -160,13 +161,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // FIX: The reductionPrime was being subtracted twice. It's already in the sum as a negative.
         const totalDeterminant = Object.values(determinants).reduce((sum, value) => sum + value, 0); 
         resultElements.totalDeterminantSum.textContent = formatCurrency(totalDeterminant);
         return totalDeterminant;
     };
     
     const calculateResults = () => {
+        // Reset results before calculating
+        resetResults();
         const totalDeterminant = updateDeterminantTable();
         if (!config || Object.keys(config).length === 0) return;
 
@@ -197,10 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
         resultElements.diffPercent.textContent = `${diffPercent.toFixed(2)} %`;
         [resultElements.diffValeur, resultElements.diffPercent].forEach(el => el.classList.toggle('negative-value', diffValeur < 0));
         
-        resultElements.breakdownBody.innerHTML = '';
-        resultElements.breakdownFoot.innerHTML = '';
-        resultElements.tauxReductionApplicable.textContent = '...';
-
         if (diffValeur < 0) {
             resultElements.droitReduction.textContent = "Non";
             resultElements.tauxReductionApplicable.textContent = 'Non applicable';
@@ -221,8 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const adultAnnualReduction = (inputs.adultes * premiums.adult) * (reductionRatePercent / 100) * 12;
-        const youngAnnualReduction = (inputs.jeunes * premiums.young) * (config.taux_reduction_jeune / 100) * 12;
-        const childAnnualReduction = (inputs.enfantsNb * premiums.child) * (config.taux_reduction_enfant / 100) * 12;
+        const youngAnnualReduction = (inputs.jeunes * premiums.young) * ((config.taux_reduction_jeune || 0) / 100) * 12;
+        const childAnnualReduction = (inputs.enfantsNb * premiums.child) * ((config.taux_reduction_enfant || 0) / 100) * 12;
         
         let totalAnnualReduction = 0;
         if (inputs.adultes > 0) {
@@ -230,11 +228,11 @@ document.addEventListener('DOMContentLoaded', () => {
             totalAnnualReduction += adultAnnualReduction;
         }
         if (inputs.jeunes > 0) {
-            resultElements.breakdownBody.innerHTML += `<tr><td>Jeunes (19-25 ans)</td><td>${formatCurrency(premiums.young)}</td><td>${config.taux_reduction_jeune.toFixed(2)} %</td><td>${formatCurrency(youngAnnualReduction)}</td></tr>`;
+            resultElements.breakdownBody.innerHTML += `<tr><td>Jeunes (19-25 ans)</td><td>${formatCurrency(premiums.young)}</td><td>${(config.taux_reduction_jeune || 0).toFixed(2)} %</td><td>${formatCurrency(youngAnnualReduction)}</td></tr>`;
             totalAnnualReduction += youngAnnualReduction;
         }
         if (inputs.enfantsNb > 0) {
-            resultElements.breakdownBody.innerHTML += `<tr><td>Enfants (0-18 ans)</td><td>${formatCurrency(premiums.child)}</td><td>${config.taux_reduction_enfant.toFixed(2)} %</td><td>${formatCurrency(childAnnualReduction)}</td></tr>`;
+            resultElements.breakdownBody.innerHTML += `<tr><td>Enfants (0-18 ans)</td><td>${formatCurrency(premiums.child)}</td><td>${(config.taux_reduction_enfant || 0).toFixed(2)} %</td><td>${formatCurrency(childAnnualReduction)}</td></tr>`;
             totalAnnualReduction += childAnnualReduction;
         }
 
@@ -251,7 +249,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         localStorage.setItem('primeReductionData', JSON.stringify(dataToSave));
-        // alert('Vos données ont été sauvegardées localement.');
     };
 
     const loadData = () => {
@@ -269,11 +266,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const clearData = () => {
         localStorage.removeItem('primeReductionData');
-        // This is a soft reset, consider a hard reset by reloading the page
         Object.values(elements).forEach(el => {
             if (el.tagName === 'INPUT' || el.tagName === 'SELECT') {
                 if(el.type !== 'submit' && el.type !== 'button') {
-                     // Maybe reset to default values instead of blank
                      if (el.id === 'annee-calcul') el.value = DEFAULT_YEAR;
                      else if (el.matches('select')) el.selectedIndex = 0;
                      else el.value = el.id.includes('nombre') ? '0' : '';
@@ -282,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         updateDeterminantTable();
         resetResults();
-    }
+    };
 
     // --- Event Handlers ---
     const printHandler = () => window.print();
@@ -290,21 +285,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleDataLoadingAndRecalculate = async () => {
         const year = parseInput(elements.anneeCalcul);
         let success = await loadDataForYear(year);
-        let fallbackUsed = false;
-
         if (!success) {
-            fallbackUsed = true;
             success = await loadDataForYear(DEFAULT_YEAR);
             if(success) {
                 elements.anneeCalcul.value = DEFAULT_YEAR;
                  alert(`Les données pour l'année ${year} n'ont pas pu être trouvées. Utilisation des données de l'année de référence ${DEFAULT_YEAR}.`);
             }
         }
-        
         if(success) {
-            calculateResults();
+            updateDeterminantTable();
+            resetResults();
         } else {
-             alert(`Erreur critique: Impossible de charger les données de base, même pour l'année de référence ${DEFAULT_YEAR}. Le calculateur ne peut pas fonctionner.`);
+             alert(`Erreur critique: Impossible de charger les données de base. Le calculateur ne peut pas fonctionner.`);
              resetResults();
         }
     };
@@ -323,10 +315,10 @@ document.addEventListener('DOMContentLoaded', () => {
         skipBtn: document.getElementById('assistant-skip-btn'),
         
         steps: [],
+        placeholders: new Map(),
         currentStepIndex: 0,
         skippedSteps: new Set(),
         isActive: false,
-        elementOriginalPlacement: new Map(), // Stores {wrapperElement: {parent: HTMLElement, nextSibling: HTMLElement | null}}
 
         init() {
             this.defineSteps();
@@ -336,7 +328,6 @@ document.addEventListener('DOMContentLoaded', () => {
             this.nextBtn.addEventListener('click', () => this.nextStep());
             this.skipBtn.addEventListener('click', () => this.skipStep());
             
-            // Toast notification logic
             const toast = document.getElementById('toast-notification');
             if (localStorage.getItem('primeReductionData')) {
                 toast.style.display = 'flex';
@@ -367,18 +358,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 let titleText;
                 let wrapperEl;
 
-                if (container.tagName === 'TR') { // Section 2 table row
+                if (container.tagName === 'TR') {
                     const rubrique = container.querySelector('td:nth-child(1)').textContent.trim();
                     const code = container.querySelector('td:nth-child(2)').textContent.trim();
                     titleText = `${rubrique} (code ${code})`;
                     wrapperEl = container.querySelector('td.input-wrapper');
-                } else { // Section 1 form-row
+                } else {
                     const labelEl = container.querySelector('label');
                     titleText = labelEl ? labelEl.textContent.trim() : stepId;
                     wrapperEl = container.querySelector('.input-wrapper');
                 }
                 
-                let validationFn = (value) => value !== ''; // Default validation
+                let validationFn = (value) => value !== '';
                 let validationMsg = "Ce champ ne peut pas être vide.";
 
                 if (inputEl.id.startsWith('nombre-')) {
@@ -389,28 +380,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     validationFn = (value) => parseFloat(value) >= 1;
                     validationMsg = "Le nombre d'adultes doit être d'au moins 1.";
                 }
-                // Check if it's a financial input that should be positive, excluding fortune (which can be negative)
                 if (inputEl.type === 'text' && !inputEl.id.startsWith('nombre') && inputEl.id !== 'fortune-imposable') {
                     validationFn = isPositiveNumber;
                     validationMsg = "Veuillez entrer un montant positif.";
                 }
-                // For fortune, it can be negative but must be a number
                 if (inputEl.id === 'fortune-imposable') {
                     validationFn = (value) => !isNaN(parseFloat(value));
                     validationMsg = "Veuillez entrer un nombre valide pour la fortune.";
                 }
 
-
-                return {
-                    id: stepId,
-                    element: inputEl,
-                    wrapper: wrapperEl,
-                    title: titleText,
-                    help: helpEl ? helpEl.dataset.tooltip : "Aucune aide disponible pour ce champ.",
-                    validate: validationFn,
-                    validationMessage: validationMsg,
-                    isCritical: inputEl.id === 'nombre-adultes'
-                };
+                return { id: stepId, element: inputEl, wrapper: wrapperEl, title: titleText, help: helpEl ? helpEl.dataset.tooltip : "Aucune aide disponible.", validate: validationFn, validationMessage: validationMsg, isCritical: inputEl.id === 'nombre-adultes' };
             });
         },
 
@@ -419,66 +398,48 @@ document.addEventListener('DOMContentLoaded', () => {
             this.isActive = true;
             this.currentStepIndex = 0;
             this.skippedSteps.clear();
-            this.elementOriginalPlacement.clear();
-            
-            // Store original placement for all wrappers when starting the assistant
+            this.placeholders.clear();
+
             this.steps.forEach(step => {
-                if (step.wrapper && step.wrapper.parentNode) {
-                    this.elementOriginalPlacement.set(step.wrapper, {
-                        parent: step.wrapper.parentNode,
-                        nextSibling: step.wrapper.nextSibling
-                    });
-                }
+                if (!step.wrapper) return;
+                const placeholder = document.createElement(step.wrapper.tagName);
+                placeholder.className = step.wrapper.className;
+                this.placeholders.set(step.id, placeholder);
+                step.wrapper.parentNode.replaceChild(placeholder, step.wrapper);
             });
 
             this.modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden'; // Prevent scrolling body
+            document.body.style.overflow = 'hidden';
             this.renderStep();
         },
 
         close() {
             this.isActive = false;
             this.modal.style.display = 'none';
-            document.body.style.overflow = 'auto'; // Restore scrolling body
+            document.body.style.overflow = 'auto';
 
-            // Restore ALL elements to their original places
             this.steps.forEach(step => {
-                const originalPlacement = this.elementOriginalPlacement.get(step.wrapper);
-                if (originalPlacement) {
-                    originalPlacement.parent.insertBefore(step.wrapper, originalPlacement.nextSibling);
+                const placeholder = this.placeholders.get(step.id);
+                if (placeholder && placeholder.parentNode) {
+                    placeholder.parentNode.replaceChild(step.wrapper, placeholder);
                 }
             });
-            this.elementOriginalPlacement.clear(); // Clear the map after restoring all elements
+            this.placeholders.clear();
             updateDeterminantTable();
         },
 
         renderStep() {
             const step = this.steps[this.currentStepIndex];
             if (!step) return;
-
-            // First, ensure the previously moved element is returned to its original place
-            if (this.inputContainer.children.length > 0) {
-                const previousWrapper = this.inputContainer.children[0];
-                const previousStep = this.steps.find(s => s.wrapper === previousWrapper); // Find by wrapper reference
-
-                if (previousStep) {
-                    const originalPlacement = this.elementOriginalPlacement.get(previousStep.wrapper);
-                    if (originalPlacement) {
-                        originalPlacement.parent.insertBefore(previousStep.wrapper, originalPlacement.nextSibling);
-                    }
-                }
-            }
             
             this.title.textContent = `${step.title} (${this.currentStepIndex + 1}/${this.steps.length})`;
             this.helpText.textContent = step.help;
             this.validationError.style.display = 'none';
 
-            // Move the input wrapper into the modal
-            this.inputContainer.innerHTML = ''; // Clear previous content
+            this.inputContainer.innerHTML = '';
             this.inputContainer.appendChild(step.wrapper);
             step.element.focus();
 
-            // Update buttons
             this.prevBtn.style.display = this.currentStepIndex > 0 ? 'block' : 'none';
             this.skipBtn.style.display = step.isCritical ? 'none' : 'block';
             this.nextBtn.textContent = (this.currentStepIndex === this.steps.length - 1 && this.skippedSteps.size === 0) ? "Terminer" : "Suivant";
@@ -491,12 +452,12 @@ document.addEventListener('DOMContentLoaded', () => {
             this.steps.forEach((step, index) => {
                 const dot = document.createElement('div');
                 dot.className = 'progress-dot';
-                dot.title = step.title; // Add title for hover info
+                dot.title = step.title;
                 if (index === this.currentStepIndex) {
                     dot.classList.add('current');
                 } else if (this.skippedSteps.has(index)) {
                     dot.classList.add('skipped');
-                } else if (step.element && step.element.value !== '' && step.validate(step.element.value)) { // Check if value is not empty and valid
+                } else if (step.element && step.element.value !== '' && step.validate(step.element.value)) {
                     dot.classList.add('answered');
                 }
                 this.progressBar.appendChild(dot);
@@ -511,19 +472,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            this.skippedSteps.delete(this.currentStepIndex); // Mark as answered
-            saveData(); // Save after each successful step
+            this.skippedSteps.delete(this.currentStepIndex);
+            saveData();
 
             if (this.currentStepIndex < this.steps.length - 1) {
                 this.currentStepIndex++;
             } else {
-                // End of the line, check for skipped steps
-                const nextSkippedIndex = Array.from(this.skippedSteps).sort((a, b) => a - b).find(index => index >= 0); // Get smallest skipped index
+                const nextSkippedIndex = Array.from(this.skippedSteps).sort((a, b) => a - b)[0];
                 if (nextSkippedIndex !== undefined) {
                     this.currentStepIndex = nextSkippedIndex;
                 } else {
                     this.close();
-                    calculateResults(); // All questions answered
+                    calculateResults();
                     return;
                 }
             }
@@ -532,15 +492,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         prevStep() {
             if (this.currentStepIndex > 0) {
-                // Before moving back, put the current element back to its original parent
-                const currentStep = this.steps[this.currentStepIndex];
-                if (currentStep) {
-                    const originalPlacement = this.elementOriginalPlacement.get(currentStep.wrapper);
-                    if (originalPlacement) {
-                        originalPlacement.parent.insertBefore(currentStep.wrapper, originalPlacement.nextSibling);
-                    }
-                }
-
                 this.currentStepIndex--;
                 this.renderStep();
             }
@@ -548,27 +499,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         skipStep() {
             const step = this.steps[this.currentStepIndex];
-            if (step.isCritical) return; // Critical steps cannot be skipped
-
+            if (step.isCritical) return;
             this.skippedSteps.add(this.currentStepIndex);
             
-            // Move current element back to its original parent before skipping
-            if (step) {
-                const originalPlacement = this.elementOriginalPlacement.get(step.wrapper);
-                if (originalPlacement) {
-                    originalPlacement.parent.insertBefore(step.wrapper, originalPlacement.nextSibling);
-                }
-            }
-
             if (this.currentStepIndex < this.steps.length - 1) {
                 this.currentStepIndex++;
             } else {
-                 // If at the end, find the next skipped question from the beginning
-                 const nextSkippedIndex = Array.from(this.skippedSteps).sort((a, b) => a - b).find(index => index >= 0);
+                 const nextSkippedIndex = Array.from(this.skippedSteps).sort((a, b) => a - b)[0];
                  if (nextSkippedIndex !== undefined) {
                     this.currentStepIndex = nextSkippedIndex;
                  } else {
-                    this.close(); // No more skipped questions
+                    this.close();
                     return;
                  }
             }
@@ -581,19 +522,13 @@ document.addEventListener('DOMContentLoaded', () => {
         await handleDataLoadingAndRecalculate();
         assistant.init();
 
-        // Attach event listeners
-        // Need to ensure event listeners are attached only once, or handle potential duplicates if elements are moved
         Object.values(elements).forEach(el => {
             if (!el) return;
-            // Remove existing listeners to prevent duplicates if init is called multiple times (e.g. from loadData)
-            // This is a safety measure; ideally init() is called once.
             if (el.tagName === 'INPUT' || el.tagName === 'SELECT') {
                 if(el.id === 'annee-calcul') {
-                    el.removeEventListener('change', handleDataLoadingAndRecalculate); // Remove existing
-                    el.addEventListener('change', handleDataLoadingAndRecalculate); // Add new
+                    el.addEventListener('change', handleDataLoadingAndRecalculate);
                 } else {
-                    el.removeEventListener('input', updateDeterminantTable); // Remove existing
-                    el.addEventListener('input', updateDeterminantTable); // Add new
+                    el.addEventListener('input', updateDeterminantTable);
                 }
             }
         });
