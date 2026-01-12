@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
             rachatAssurance: Math.max(0, inputs.rachatAssurance - config.franchise_rachat_lpp),
             interetsPassifs: Math.max(0, inputs.interetsPassifs - config.franchise_interets_passifs),
             fraisImmeubles: Math.max(0, inputs.fraisImmeubles - config.franchise_frais_immeubles),
-            fortuneImposable: inputs.fortune / 20,
+            fortuneImposable: Math.max(0, inputs.fortune) / 20, // FIX: Fortune can't be negative for determinant value
         };
 
         Object.keys(determinantElements).forEach(key => {
@@ -160,7 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        const totalDeterminant = Object.values(determinants).reduce((sum, value) => sum + value, 0) - determinants.reductionPrime;
+        // FIX: The reductionPrime was being subtracted twice. It's already in the sum as a negative.
+        const totalDeterminant = Object.values(determinants).reduce((sum, value) => sum + value, 0); 
         resultElements.totalDeterminantSum.textContent = formatCurrency(totalDeterminant);
         return totalDeterminant;
     };
@@ -325,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentStepIndex: 0,
         skippedSteps: new Set(),
         isActive: false,
-        originalParents: new Map(),
+        originalParents: new Map(), // Stores {wrapperElement: originalParentNode}
 
         init() {
             this.defineSteps();
@@ -360,9 +361,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const stepElements = Array.from(document.querySelectorAll('[data-step-id]'));
             this.steps = stepElements.map(container => {
                 const stepId = container.dataset.stepId;
-                const labelEl = container.querySelector('label') || container.querySelector('td');
                 const inputEl = document.getElementById(stepId);
                 const helpEl = container.querySelector('.help-tooltip');
+                
+                let titleText;
+                let wrapperEl;
+
+                if (container.tagName === 'TR') { // Section 2 table row
+                    const rubrique = container.querySelector('td:nth-child(1)').textContent.trim();
+                    const code = container.querySelector('td:nth-child(2)').textContent.trim();
+                    titleText = `${rubrique} (code ${code})`;
+                    wrapperEl = container.querySelector('td.input-wrapper');
+                } else { // Section 1 form-row
+                    const labelEl = container.querySelector('label');
+                    titleText = labelEl ? labelEl.textContent.trim() : stepId;
+                    wrapperEl = container.querySelector('.input-wrapper');
+                }
                 
                 let validationFn = (value) => value !== ''; // Default validation
                 let validationMsg = "Ce champ ne peut pas être vide.";
@@ -375,16 +389,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     validationFn = (value) => parseFloat(value) >= 1;
                     validationMsg = "Le nombre d'adultes doit être d'au moins 1.";
                 }
-                if(inputEl.id !== 'fortune-imposable' && (inputEl.type === 'text' && !inputEl.id.startsWith('nombre'))){
+                // Check if it's a financial input that should be positive, excluding fortune (which can be negative)
+                if (inputEl.type === 'text' && !inputEl.id.startsWith('nombre') && inputEl.id !== 'fortune-imposable') {
                     validationFn = isPositiveNumber;
                     validationMsg = "Veuillez entrer un montant positif.";
                 }
+                // For fortune, it can be negative but must be a number
+                if (inputEl.id === 'fortune-imposable') {
+                    validationFn = (value) => !isNaN(parseFloat(value));
+                    validationMsg = "Veuillez entrer un nombre valide pour la fortune.";
+                }
+
 
                 return {
                     id: stepId,
                     element: inputEl,
-                    wrapper: container.querySelector('.input-wrapper') || container.querySelector('td.input-wrapper'),
-                    title: labelEl.textContent,
+                    wrapper: wrapperEl,
+                    title: titleText,
                     help: helpEl ? helpEl.dataset.tooltip : "Aucune aide disponible pour ce champ.",
                     validate: validationFn,
                     validationMessage: validationMsg,
@@ -398,46 +419,77 @@ document.addEventListener('DOMContentLoaded', () => {
             this.isActive = true;
             this.currentStepIndex = 0;
             this.skippedSteps.clear();
-            this.originalParents.clear();
+            
+            // Store original parents for all wrappers when starting the assistant
+            this.steps.forEach(step => {
+                if (step.wrapper && step.wrapper.parentNode) {
+                    this.originalParents.set(step.wrapper, step.wrapper.parentNode);
+                }
+            });
+
             this.modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling body
             this.renderStep();
         },
 
         close() {
             this.isActive = false;
             this.modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            // Restore the last element to its original place
-            if (this.originalParents.size > 0) {
-                 const lastStep = this.steps[this.currentStepIndex];
-                 if (lastStep && this.originalParents.has(lastStep.wrapper)) {
-                    this.originalParents.get(lastStep.wrapper).appendChild(lastStep.wrapper);
-                 }
-            }
+            document.body.style.overflow = 'auto'; // Restore scrolling body
+
+            // Restore ALL elements to their original places
+            this.originalParents.forEach((originalParent, wrapper) => {
+                // Find the correct insertion point in the original parent
+                const originalContainer = document.querySelector(`[data-step-id="${wrapper.closest('[data-step-id]').dataset.stepId}"]`);
+                if (originalContainer) {
+                    // Assuming wrapper is either .input-wrapper or td.input-wrapper inside a form-row or tr
+                    // We need to re-insert it where it was originally.
+                    // For form-row, wrapper is a div.input-wrapper, its original parent is the form-row.
+                    // For table, wrapper is a td.input-wrapper, its original parent is the tr.
+                    if (originalParent.querySelector(`#${wrapper.id}`)) { // Check if the element already exists
+                        // If the element is already there, don't re-append. This might happen if 'close' is called
+                        // multiple times or if there's a specific interaction.
+                        // However, based on the logic, the element should always be in the inputContainer
+                        // and needs to be moved back.
+                    } else {
+                        // Re-insert the wrapper
+                        originalParent.appendChild(wrapper);
+                    }
+                }
+            });
+            this.originalParents.clear(); // Clear the map after restoring all elements
             updateDeterminantTable();
         },
 
         renderStep() {
             const step = this.steps[this.currentStepIndex];
             if (!step) return;
+
+            // First, ensure the previously moved element is returned to its original place
+            // before moving the new one. This prevents elements from being permanently removed.
+            if (this.inputContainer.children.length > 0) {
+                const previousWrapper = this.inputContainer.children[0];
+                const previousStepId = previousWrapper.querySelector('input, select').id;
+                const previousStep = this.steps.find(s => s.id === previousStepId);
+
+                if (previousStep && this.originalParents.has(previousStep.wrapper)) {
+                    this.originalParents.get(previousStep.wrapper).appendChild(previousStep.wrapper);
+                }
+            }
             
             this.title.textContent = `${step.title} (${this.currentStepIndex + 1}/${this.steps.length})`;
             this.helpText.textContent = step.help;
             this.validationError.style.display = 'none';
 
             // Move the input wrapper into the modal
-            if (!this.originalParents.has(step.wrapper)) {
-                this.originalParents.set(step.wrapper, step.wrapper.parentNode);
-            }
-            this.inputContainer.innerHTML = '';
+            this.inputContainer.innerHTML = ''; // Clear previous content
             this.inputContainer.appendChild(step.wrapper);
             step.element.focus();
 
             // Update buttons
             this.prevBtn.style.display = this.currentStepIndex > 0 ? 'block' : 'none';
             this.skipBtn.style.display = step.isCritical ? 'none' : 'block';
-            this.nextBtn.textContent = this.currentStepIndex === this.steps.length - 1 && this.skippedSteps.size === 0 ? "Terminer" : "Suivant";
+            this.nextBtn.textContent = (this.currentStepIndex === this.steps.length - 1 && this.skippedSteps.size === 0) ? "Terminer" : "Suivant";
 
             this.renderProgressBar();
         },
@@ -447,11 +499,12 @@ document.addEventListener('DOMContentLoaded', () => {
             this.steps.forEach((step, index) => {
                 const dot = document.createElement('div');
                 dot.className = 'progress-dot';
+                dot.title = step.title; // Add title for hover info
                 if (index === this.currentStepIndex) {
                     dot.classList.add('current');
                 } else if (this.skippedSteps.has(index)) {
                     dot.classList.add('skipped');
-                } else if (step.validate(step.element.value)) {
+                } else if (step.element && step.validate(step.element.value) && step.element.value !== '') { // Check if value is not empty
                     dot.classList.add('answered');
                 }
                 this.progressBar.appendChild(dot);
@@ -473,9 +526,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.currentStepIndex++;
             } else {
                 // End of the line, check for skipped steps
-                const nextSkipped = this.skippedSteps.values().next().value;
-                if (nextSkipped !== undefined) {
-                    this.currentStepIndex = nextSkipped;
+                const nextSkippedIndex = Array.from(this.skippedSteps).sort((a, b) => a - b).find(index => index >= 0); // Get smallest skipped index
+                if (nextSkippedIndex !== undefined) {
+                    this.currentStepIndex = nextSkippedIndex;
                 } else {
                     this.close();
                     calculateResults(); // All questions answered
@@ -487,6 +540,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         prevStep() {
             if (this.currentStepIndex > 0) {
+                // Before moving back, put the current element back to its original parent
+                const currentStep = this.steps[this.currentStepIndex];
+                if (currentStep && this.originalParents.has(currentStep.wrapper)) {
+                    this.originalParents.get(currentStep.wrapper).appendChild(currentStep.wrapper);
+                }
+
                 this.currentStepIndex--;
                 this.renderStep();
             }
@@ -494,18 +553,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         skipStep() {
             const step = this.steps[this.currentStepIndex];
-            if (step.isCritical) return;
+            if (step.isCritical) return; // Critical steps cannot be skipped
 
             this.skippedSteps.add(this.currentStepIndex);
             
+            // Move current element back to its original parent before skipping
+            if (step && this.originalParents.has(step.wrapper)) {
+                this.originalParents.get(step.wrapper).appendChild(step.wrapper);
+            }
+
             if (this.currentStepIndex < this.steps.length - 1) {
                 this.currentStepIndex++;
             } else {
-                 const nextSkipped = Array.from(this.skippedSteps).find(i => i !== this.currentStepIndex);
-                 if (nextSkipped !== undefined) {
-                    this.currentStepIndex = nextSkipped;
+                 // If at the end, find the next skipped question from the beginning
+                 const nextSkippedIndex = Array.from(this.skippedSteps).sort((a, b) => a - b).find(index => index >= 0);
+                 if (nextSkippedIndex !== undefined) {
+                    this.currentStepIndex = nextSkippedIndex;
                  } else {
-                    this.close();
+                    this.close(); // No more skipped questions
                     return;
                  }
             }
@@ -519,13 +584,18 @@ document.addEventListener('DOMContentLoaded', () => {
         assistant.init();
 
         // Attach event listeners
+        // Need to ensure event listeners are attached only once, or handle potential duplicates if elements are moved
         Object.values(elements).forEach(el => {
             if (!el) return;
+            // Remove existing listeners to prevent duplicates if init is called multiple times (e.g. from loadData)
+            // This is a safety measure; ideally init() is called once.
             if (el.tagName === 'INPUT' || el.tagName === 'SELECT') {
                 if(el.id === 'annee-calcul') {
-                    el.addEventListener('change', handleDataLoadingAndRecalculate);
+                    el.removeEventListener('change', handleDataLoadingAndRecalculate); // Remove existing
+                    el.addEventListener('change', handleDataLoadingAndRecalculate); // Add new
                 } else {
-                    el.addEventListener('input', updateDeterminantTable);
+                    el.removeEventListener('input', updateDeterminantTable); // Remove existing
+                    el.addEventListener('input', updateDeterminantTable); // Add new
                 }
             }
         });
