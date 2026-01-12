@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentStepIndex: 0,
         skippedSteps: new Set(),
         isActive: false,
-        originalParents: new Map(), // Stores {wrapperElement: originalParentNode}
+        elementOriginalPlacement: new Map(), // Stores {wrapperElement: {parent: HTMLElement, nextSibling: HTMLElement | null}}
 
         init() {
             this.defineSteps();
@@ -419,11 +419,15 @@ document.addEventListener('DOMContentLoaded', () => {
             this.isActive = true;
             this.currentStepIndex = 0;
             this.skippedSteps.clear();
+            this.elementOriginalPlacement.clear();
             
-            // Store original parents for all wrappers when starting the assistant
+            // Store original placement for all wrappers when starting the assistant
             this.steps.forEach(step => {
                 if (step.wrapper && step.wrapper.parentNode) {
-                    this.originalParents.set(step.wrapper, step.wrapper.parentNode);
+                    this.elementOriginalPlacement.set(step.wrapper, {
+                        parent: step.wrapper.parentNode,
+                        nextSibling: step.wrapper.nextSibling
+                    });
                 }
             });
 
@@ -438,26 +442,13 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.style.overflow = 'auto'; // Restore scrolling body
 
             // Restore ALL elements to their original places
-            this.originalParents.forEach((originalParent, wrapper) => {
-                // Find the correct insertion point in the original parent
-                const originalContainer = document.querySelector(`[data-step-id="${wrapper.closest('[data-step-id]').dataset.stepId}"]`);
-                if (originalContainer) {
-                    // Assuming wrapper is either .input-wrapper or td.input-wrapper inside a form-row or tr
-                    // We need to re-insert it where it was originally.
-                    // For form-row, wrapper is a div.input-wrapper, its original parent is the form-row.
-                    // For table, wrapper is a td.input-wrapper, its original parent is the tr.
-                    if (originalParent.querySelector(`#${wrapper.id}`)) { // Check if the element already exists
-                        // If the element is already there, don't re-append. This might happen if 'close' is called
-                        // multiple times or if there's a specific interaction.
-                        // However, based on the logic, the element should always be in the inputContainer
-                        // and needs to be moved back.
-                    } else {
-                        // Re-insert the wrapper
-                        originalParent.appendChild(wrapper);
-                    }
+            this.steps.forEach(step => {
+                const originalPlacement = this.elementOriginalPlacement.get(step.wrapper);
+                if (originalPlacement) {
+                    originalPlacement.parent.insertBefore(step.wrapper, originalPlacement.nextSibling);
                 }
             });
-            this.originalParents.clear(); // Clear the map after restoring all elements
+            this.elementOriginalPlacement.clear(); // Clear the map after restoring all elements
             updateDeterminantTable();
         },
 
@@ -466,14 +457,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!step) return;
 
             // First, ensure the previously moved element is returned to its original place
-            // before moving the new one. This prevents elements from being permanently removed.
             if (this.inputContainer.children.length > 0) {
                 const previousWrapper = this.inputContainer.children[0];
-                const previousStepId = previousWrapper.querySelector('input, select').id;
-                const previousStep = this.steps.find(s => s.id === previousStepId);
+                const previousStep = this.steps.find(s => s.wrapper === previousWrapper); // Find by wrapper reference
 
-                if (previousStep && this.originalParents.has(previousStep.wrapper)) {
-                    this.originalParents.get(previousStep.wrapper).appendChild(previousStep.wrapper);
+                if (previousStep) {
+                    const originalPlacement = this.elementOriginalPlacement.get(previousStep.wrapper);
+                    if (originalPlacement) {
+                        originalPlacement.parent.insertBefore(previousStep.wrapper, originalPlacement.nextSibling);
+                    }
                 }
             }
             
@@ -504,7 +496,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     dot.classList.add('current');
                 } else if (this.skippedSteps.has(index)) {
                     dot.classList.add('skipped');
-                } else if (step.element && step.validate(step.element.value) && step.element.value !== '') { // Check if value is not empty
+                } else if (step.element && step.element.value !== '' && step.validate(step.element.value)) { // Check if value is not empty and valid
                     dot.classList.add('answered');
                 }
                 this.progressBar.appendChild(dot);
@@ -542,8 +534,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.currentStepIndex > 0) {
                 // Before moving back, put the current element back to its original parent
                 const currentStep = this.steps[this.currentStepIndex];
-                if (currentStep && this.originalParents.has(currentStep.wrapper)) {
-                    this.originalParents.get(currentStep.wrapper).appendChild(currentStep.wrapper);
+                if (currentStep) {
+                    const originalPlacement = this.elementOriginalPlacement.get(currentStep.wrapper);
+                    if (originalPlacement) {
+                        originalPlacement.parent.insertBefore(currentStep.wrapper, originalPlacement.nextSibling);
+                    }
                 }
 
                 this.currentStepIndex--;
@@ -558,8 +553,11 @@ document.addEventListener('DOMContentLoaded', () => {
             this.skippedSteps.add(this.currentStepIndex);
             
             // Move current element back to its original parent before skipping
-            if (step && this.originalParents.has(step.wrapper)) {
-                this.originalParents.get(step.wrapper).appendChild(step.wrapper);
+            if (step) {
+                const originalPlacement = this.elementOriginalPlacement.get(step.wrapper);
+                if (originalPlacement) {
+                    originalPlacement.parent.insertBefore(step.wrapper, originalPlacement.nextSibling);
+                }
             }
 
             if (this.currentStepIndex < this.steps.length - 1) {
