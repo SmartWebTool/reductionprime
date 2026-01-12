@@ -6,6 +6,9 @@
     --dark-gray: #333;
     --font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
 }
 
 body {
@@ -76,22 +79,22 @@ header h1 {
 }
 
 .form-row label {
-    flex-basis: 300px; /* Adjust as needed */
+    flex: 1 1 300px; /* Allow label to take space */
     font-weight: bold;
 }
 
-.input-group {
+.input-wrapper {
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-grow: 1;
+    flex: 2 1 250px; /* Allow input to take more space */
 }
 
-input[type="text"], select { /* Changed type from number to text here */
+input[type="text"], select {
     padding: 8px;
     border: 1px solid var(--medium-gray);
     border-radius: 4px;
-    width: 120px; /* Default width */
+    width: 120px;
     font-size: 1em;
 }
 
@@ -114,9 +117,18 @@ select {
     vertical-align: middle;
 }
 
+.determinant-table td.input-wrapper {
+    padding: 0;
+}
+.determinant-table td.input-wrapper input {
+    padding: 8px 10px;
+    border: none;
+    border-radius: 0;
+}
+
 .cell-help {
     text-align: center;
-    position: relative; /* Crucial for correct tooltip positioning */
+    width: 40px;
 }
 
 .determinant-table thead {
@@ -128,7 +140,7 @@ select {
     font-weight: bold;
 }
 
-.determinant-table td input[type="text"] { /* Changed type from number to text here */
+.determinant-table td input[type="text"] {
     width: 100%;
     box-sizing: border-box; /* Ensures padding doesn't add to width */
 }
@@ -166,7 +178,6 @@ select {
 
 /* Help Tooltip */
 .help-tooltip {
-    position: relative;
     display: inline-block;
     cursor: help;
     background-color: var(--medium-gray);
@@ -177,6 +188,7 @@ select {
     text-align: center;
     font-weight: bold;
     line-height: 20px;
+    flex-shrink: 0; /* Prevent shrinking in flex layouts */
 }
 
 .help-tooltip:before {
@@ -196,14 +208,212 @@ select {
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.3s, visibility 0.3s;
-    z-index: 100; /* Ensure it appears above other elements */
-    white-space: normal; /* Allow text to wrap */
+    z-index: 100;
+    white-space: normal;
 }
 
 .help-tooltip:hover:before {
     visibility: visible;
     opacity: 1;
 }
+
+/* --- New Assistant & Toast Styles --- */
+
+/* Toast Notification */
+.toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--dark-gray);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.toast button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#toast-load-yes {
+    background-color: var(--primary-color);
+    color: white;
+}
+#toast-load-no {
+    background-color: var(--medium-gray);
+    color: var(--dark-gray);
+}
+
+
+/* Assistant Banner */
+.assistant-banner {
+    background-color: var(--light-gray);
+    border: 1px dashed var(--primary-color);
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+.assistant-banner p {
+    margin: 0;
+    font-weight: 500;
+}
+#start-assistant-btn {
+    background-color: var(--primary-color);
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    width: 90%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--medium-gray);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5em;
+    color: var(--primary-color);
+}
+.close-button {
+    background: none;
+    border: none;
+    font-size: 2em;
+    cursor: pointer;
+    color: var(--dark-gray);
+}
+
+.modal-body #assistant-help-text {
+    background-color: var(--light-gray);
+    border-left: 4px solid var(--primary-color);
+    padding: 10px;
+    margin: 0 0 20px 0;
+    font-size: 0.9em;
+}
+
+#assistant-input-container {
+    margin-bottom: 15px;
+}
+
+#assistant-input-container .input-wrapper,
+#assistant-input-container .input-wrapper input,
+#assistant-input-container .input-wrapper select {
+    width: 100%;
+}
+
+.validation-error {
+    color: var(--danger-color);
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--medium-gray);
+    padding-top: 15px;
+    margin-top: auto;
+}
+
+/* Progress Bar */
+#assistant-progress-bar {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 15px;
+    flex-wrap: wrap; /* Allow dots to wrap on small screens */
+}
+.progress-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: var(--medium-gray);
+    border: 2px solid var(--medium-gray);
+    transition: all 0.2s;
+}
+.progress-dot.answered {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+}
+.progress-dot.skipped {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+}
+.progress-dot.current {
+    border-color: var(--primary-color);
+    transform: scale(1.2);
+}
+
+/* Assistant Buttons */
+.assistant-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+#assistant-prev-btn, #assistant-next-btn, #assistant-skip-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+#assistant-next-btn {
+    background-color: var(--primary-color);
+    color: white;
+}
+#assistant-prev-btn {
+    background-color: var(--medium-gray);
+}
+#assistant-skip-btn {
+    background-color: transparent;
+    border: 1px solid var(--medium-gray);
+}
+
+/* --- End of New Styles --- */
 
 /* Results Section */
 .results-section {
@@ -229,8 +439,7 @@ select {
 }
 
 .result-label {
-    flex-grow: 1; /* Pushes value and help icon to the right */
-    font-weight: normal;
+    flex-grow: 1;
     color: #333;
 }
 
@@ -242,7 +451,7 @@ select {
 }
 
 .negative-value {
-    color: red;
+    color: var(--danger-color);
 }
 
 .final-result .result-label {
@@ -253,7 +462,7 @@ select {
     font-size: 1.3em;
 }
 
-/* New styles for the breakdown table */
+/* Breakdown Table */
 .reduction-breakdown-table {
     width: 100%;
     margin-top: 15px;
@@ -274,7 +483,7 @@ select {
 }
 
 .reduction-breakdown-table td:first-child {
-    text-align: left; /* Align group names to the left */
+    text-align: left;
 }
 
 .reduction-breakdown-table tfoot td {
@@ -290,7 +499,7 @@ select {
     color: #777;
 }
 
-/* Calculate Button Styles */
+/* General Button Styles */
 .calculate-button-container,
 .storage-button-container {
     text-align: center;
@@ -317,7 +526,7 @@ select {
 #print-btn:hover,
 #save-btn:hover,
 #load-btn:hover {
-    background-color: #004a8b; /* A darker shade of the primary color */
+    background-color: #004a8b;
 }
 
 /* Responsive Design */
@@ -333,22 +542,17 @@ select {
     }
 
     /* Transform table for mobile */
-    .determinant-table thead {
-        display: none;
-    }
-
+    .determinant-table thead { display: none; }
     .determinant-table, .determinant-table tbody, .determinant-table tr, .determinant-table td {
         display: block;
         width: 100%;
     }
-
     .determinant-table tr {
         margin-bottom: 15px;
         border: 2px solid var(--primary-color);
         border-radius: 5px;
         padding: 5px;
     }
-
     .determinant-table td {
         display: flex;
         justify-content: space-between;
@@ -357,59 +561,38 @@ select {
         border-bottom: 1px solid var(--light-gray);
         padding: 8px 0;
     }
-    
-    .determinant-table td:last-child {
-        border-bottom: none;
-    }
-
+    .determinant-table td:last-child { border-bottom: none; }
     .determinant-table td:before {
         content: attr(data-label);
         font-weight: bold;
         padding-right: 10px;
     }
-    
-    /* Add data-label attributes in JS or directly in HTML if static */
     .determinant-table td:nth-of-type(1):before { content: "Rubrique:"; }
     .determinant-table td:nth-of-type(2):before { content: "Code:"; }
     .determinant-table td:nth-of-type(3):before { content: "Votre Valeur:"; }
     .determinant-table td:nth-of-type(4):before { content: "Op.:"; }
     .determinant-table td:nth-of-type(5):before { content: "Valeur Déterminante:"; }
-    .determinant-table td:nth-of-type(6):before { content: ""; } /* Hide label for help */
-
-    .determinant-table td input {
-        max-width: 120px;
-    }
-    
-    .determinant-table tfoot tr {
-        border: none;
-    }
-    
+    .determinant-table td:nth-of-type(6):before { content: ""; }
+    .determinant-table td input { max-width: 120px; }
+    .determinant-table tfoot tr { border: none; }
     .determinant-table tfoot td {
         border-top: 2px solid var(--primary-color);
         margin-top: 10px;
     }
-    
-    .determinant-table tfoot td:before {
-        content: ""; /* No label for total */
-    }
+    .determinant-table tfoot td:before { content: ""; }
 
     /* Responsive for breakdown table */
-    .reduction-breakdown-table thead {
-        display: none;
-    }
-
+    .reduction-breakdown-table thead { display: none; }
     .reduction-breakdown-table, .reduction-breakdown-table tbody, .reduction-breakdown-table tr, .reduction-breakdown-table td {
         display: block;
         width: 100%;
     }
-
     .reduction-breakdown-table tr {
         margin-bottom: 15px;
         border: 2px solid var(--primary-color);
         border-radius: 5px;
         padding: 5px;
     }
-
     .reduction-breakdown-table td {
         display: flex;
         justify-content: space-between;
@@ -418,222 +601,71 @@ select {
         border-bottom: 1px solid var(--light-gray);
         padding: 8px 0;
     }
-    
-    .reduction-breakdown-table td:last-child {
-        border-bottom: none;
-    }
-
+    .reduction-breakdown-table td:last-child { border-bottom: none; }
     .reduction-breakdown-table td:nth-of-type(1):before { content: "Groupe:"; }
     .reduction-breakdown-table td:nth-of-type(2):before { content: "Prime Moyenne:"; }
     .reduction-breakdown-table td:nth-of-type(3):before { content: "Pourcentage:"; }
     .reduction-breakdown-table td:nth-of-type(4):before { content: "Réduction:"; }
-
-    .reduction-breakdown-table tfoot tr {
-        border: none;
-    }
-    
+    .reduction-breakdown-table tfoot tr { border: none; }
     .reduction-breakdown-table tfoot td {
         border-top: 2px solid var(--primary-color);
         margin-top: 10px;
     }
-    
-    .reduction-breakdown-table tfoot td:before {
-        content: ""; /* No label for total */
-    }
+    .reduction-breakdown-table tfoot td:before { content: ""; }
 }
 
 /* Print-specific Styles */
 @media print {
     body {
-        font-size: 10pt;
-        background: #fff;
-        margin: 0;
-        padding: 0;
-        color: #000;
+        font-size: 10pt; background: #fff; margin: 0; padding: 0; color: #000;
     }
-
     .container {
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
-        box-shadow: none;
-        border-radius: 0;
+        width: 100%; max-width: 100%; margin: 0; padding: 0; box-shadow: none; border-radius: 0;
     }
-
-    /* Hide non-essential elements but not table cells */
-    header p, .section-number, .help-tooltip, .calculate-button-container, .storage-button-container, .section-intro, .disclaimer, .operator {
+    header p, .section-number, .help-tooltip, .calculate-button-container, .storage-button-container, .section-intro, .disclaimer, .operator, .assistant-banner, .toast, .modal-overlay {
         display: none !important;
     }
-
     header h1 {
-        font-size: 18pt;
-        text-align: center;
-        margin-bottom: 15px; /* Reduced margin */
+        font-size: 18pt; text-align: center; margin-bottom: 15px;
     }
-    
     h2 {
-        font-size: 14pt;
-        border-bottom: none; /* Removed line */
-        padding-bottom: 0;   /* Removed padding */
-        margin-top: 15px;     /* Reduced margin */
-        margin-bottom: 5px;   /* Added for spacing before content */
+        font-size: 14pt; border-bottom: none; padding-bottom: 0; margin-top: 15px; margin-bottom: 5px;
     }
-
     section {
-        margin-bottom: 10px; /* Reduced margin */
-        page-break-inside: avoid;
+        margin-bottom: 10px; page-break-inside: avoid;
     }
-
-    /* Section 1: Situation Personnelle */
     .form-row {
-        display: flex !important; /* Use important to override responsive */
-        flex-direction: row !important;
-        justify-content: space-between;
-        align-items: center;
-        padding: 2px 0; /* Reduced padding */
-        margin-bottom: 0 !important; /* Override responsive style */
-        border-bottom: 1px solid #eee;
+        display: flex !important; flex-direction: row !important; justify-content: space-between; align-items: center; padding: 2px 0; margin-bottom: 0 !important; border-bottom: 1px solid #eee;
     }
-
     .form-row label {
-        flex-basis: auto !important;
-        margin-bottom: 0 !important; /* Override responsive style */
-        font-weight: bold;
-        flex: 1;
+        flex-basis: auto !important; margin-bottom: 0 !important; font-weight: bold; flex: 1;
     }
-
-    /* Make inputs and selects look like static text */
     input[type="text"], select {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        border: none;
-        padding: 0;
-        margin: 0;
-        font-size: 10pt;
-        width: auto;
-        background: transparent;
-        text-align: right;
-        color: #000;
-        box-shadow: none;
-        font-family: inherit;
-        flex: 1;
+        -webkit-appearance: none; -moz-appearance: none; appearance: none;
+        border: none; padding: 0; margin: 0; font-size: 10pt; width: auto; background: transparent; text-align: right; color: #000; box-shadow: none; font-family: inherit; flex: 1;
     }
-
-    select {
-       pointer-events: none;
-    }
-
-    /* Restore table layouts */
+    select { pointer-events: none; }
     .determinant-table, .reduction-breakdown-table {
-        display: table !important;
-        width: 100% !important;
-        border-collapse: collapse !important;
-        margin-top: 5px; /* Reduced margin */
+        display: table !important; width: 100% !important; border-collapse: collapse !important; margin-top: 5px;
     }
-
-    .determinant-table thead, .reduction-breakdown-table thead {
-        display: table-header-group !important;
+    .determinant-table thead, .reduction-breakdown-table thead { display: table-header-group !important; }
+    .determinant-table tbody, .reduction-breakdown-table tbody, .determinant-table tfoot, .reduction-breakdown-table tfoot { display: table-row-group !important; }
+    .determinant-table tr, .reduction-breakdown-table tr { display: table-row !important; page-break-inside: avoid; border: none !important; }
+    .determinant-table th, .determinant-table td, .reduction-breakdown-table th, .reduction-breakdown-table td {
+        display: table-cell !important; width: auto !important; border: 1px solid #ccc !important; padding: 2px 6px !important; font-size: 9pt !important; vertical-align: middle !important; text-align: left !important; background: transparent !important; justify-content: initial !important; align-items: initial !important;
     }
-
-    .determinant-table tbody, .reduction-breakdown-table tbody,
-    .determinant-table tfoot, .reduction-breakdown-table tfoot {
-        display: table-row-group !important;
-    }
-
-    .determinant-table tr, .reduction-breakdown-table tr {
-        display: table-row !important;
-        page-break-inside: avoid;
-        border: none !important;
-    }
-    
-    .determinant-table th, .determinant-table td,
-    .reduction-breakdown-table th, .reduction-breakdown-table td {
-        display: table-cell !important;
-        width: auto !important; /* Let table decide width */
-        border: 1px solid #ccc !important;
-        padding: 2px 6px !important; /* Reduced vertical padding */
-        font-size: 9pt !important;
-        vertical-align: middle !important;
-        text-align: left !important;
-        background: transparent !important;
-        justify-content: initial !important; /* override flex from responsive */
-        align-items: initial !important;
-    }
-    
-    /* Remove pseudo-element labels from responsive styles */
-    .determinant-table td:before, .reduction-breakdown-table td:before {
-        content: "" !important;
-        display: none !important;
-    }
-
-    /* Header styles */
-    .determinant-table th, .reduction-breakdown-table th {
-        font-weight: bold !important;
-        background-color: #f0f0f0 !important;
-        color: #000 !important;
-    }
-    
-    /* Input field styling */
+    .determinant-table td:before, .reduction-breakdown-table td:before { content: "" !important; display: none !important; }
+    .determinant-table th, .reduction-breakdown-table th { font-weight: bold !important; background-color: #f0f0f0 !important; color: #000 !important; }
     .determinant-table td input[type="text"] {
-        padding: 2px 6px !important; /* Reduced vertical padding */
-        width: 100% !important;
-        max-width: none !important;
-        box-sizing: border-box !important;
-        text-align: right !important;
+        padding: 2px 6px !important; width: 100% !important; max-width: none !important; box-sizing: border-box !important; text-align: right !important;
     }
-
-    /* Text alignment for specific cells */
-    .determinant-table .determinant-value,
-    .determinant-table .total-value,
-    .determinant-table tfoot .total-label {
-        text-align: right !important;
-    }
-
-    .reduction-breakdown-table td,
-    .reduction-breakdown-table th {
-        text-align: right !important;
-    }
-    
-    .determinant-table td:first-child, .determinant-table th:first-child,
-    .reduction-breakdown-table td:first-child, .reduction-breakdown-table th:first-child {
-        text-align: left !important;
-    }
-
-    /* Ensure value cells have a light background */
-    .determinant-value, .total-value {
-        background-color: #f9f9f9 !important;
-    }
-    
-    .cell-help {
-        text-align: center !important;
-    }
-
-    /* Section 3: Results */
-    .result-box {
-        border: 1px solid #ccc;
-        padding: 10px;
-        background: transparent;
-    }
-    
-    .result-item {
-        display: flex !important;
-        justify-content: space-between;
-        padding: 2px 0; /* Reduced padding */
-        border-bottom: 1px solid #eee;
-    }
-
-    .result-label {
-        flex-grow: 1;
-    }
-
-    .result-value {
-        font-weight: bold;
-        text-align: right;
-    }
-    
-    .reduction-breakdown-table tfoot td {
-        font-weight: bold !important;
-    }
+    .determinant-table .determinant-value, .determinant-table .total-value, .determinant-table tfoot .total-label, .reduction-breakdown-table td, .reduction-breakdown-table th { text-align: right !important; }
+    .determinant-table td:first-child, .determinant-table th:first-child, .reduction-breakdown-table td:first-child, .reduction-breakdown-table th:first-child { text-align: left !important; }
+    .determinant-value, .total-value { background-color: #f9f9f9 !important; }
+    .cell-help { text-align: center !important; }
+    .result-box { border: 1px solid #ccc; padding: 10px; background: transparent; }
+    .result-item { display: flex !important; justify-content: space-between; padding: 2px 0; border-bottom: 1px solid #eee; }
+    .result-label { flex-grow: 1; }
+    .result-value { font-weight: bold; text-align: right; }
+    .reduction-breakdown-table tfoot td { font-weight: bold !important; }
 }

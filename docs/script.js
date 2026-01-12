@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Helper Functions ---
     const formatCurrency = (value) => `${Math.round(value).toLocaleString('fr-CH')} CHF`;
     const parseInput = (input) => {
+        if (!input) return 0;
         const value = parseFloat(String(input.value).replace(',', '.'));
         return isNaN(value) ? 0 : value;
     };
@@ -150,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
             rachatAssurance: Math.max(0, inputs.rachatAssurance - config.franchise_rachat_lpp),
             interetsPassifs: Math.max(0, inputs.interetsPassifs - config.franchise_interets_passifs),
             fraisImmeubles: Math.max(0, inputs.fraisImmeubles - config.franchise_frais_immeubles),
-            fortuneImposable: Math.max(0, inputs.fortune) / 20,
+            fortuneImposable: inputs.fortune / 20,
         };
 
         Object.keys(determinantElements).forEach(key => {
@@ -159,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        const totalDeterminant = Object.values(determinants).reduce((sum, value) => sum + value, 0) - (determinants.reductionPrime * 2);
+        const totalDeterminant = Object.values(determinants).reduce((sum, value) => sum + value, 0) - determinants.reductionPrime;
         resultElements.totalDeterminantSum.textContent = formatCurrency(totalDeterminant);
         return totalDeterminant;
     };
@@ -175,6 +176,12 @@ document.addEventListener('DOMContentLoaded', () => {
             jeunes: parseInput(elements.nombreJeunes),
             enfantsNb: parseInput(elements.nombreEnfants),
         };
+
+        if (inputs.adultes === 0) {
+            alert("Le nombre d'adultes doit être d'au moins 1 pour un calcul valide.");
+            return;
+        }
+
         const enfants = inputs.jeunes + inputs.enfantsNb;
 
         const limitEntry = incomeLimits.find(l => l.situation === inputs.statut && l.children === enfants);
@@ -237,12 +244,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveData = () => {
         const dataToSave = {};
         Object.keys(elements).forEach(key => {
-            if (elements[key].id && elements[key].value !== undefined) {
-                 dataToSave[key] = elements[key].value;
+            const el = elements[key];
+            if (el && el.id && el.value !== undefined) {
+                 dataToSave[el.id] = el.value;
             }
         });
         localStorage.setItem('primeReductionData', JSON.stringify(dataToSave));
-        alert('Vos données ont été sauvegardées localement.');
+        // alert('Vos données ont été sauvegardées localement.');
     };
 
     const loadData = () => {
@@ -250,14 +258,31 @@ document.addEventListener('DOMContentLoaded', () => {
         if (savedData) {
             const data = JSON.parse(savedData);
             Object.keys(data).forEach(key => {
-                if (elements[key]) elements[key].value = data[key];
+                const el = document.getElementById(key);
+                if (el) el.value = data[key];
             });
-            alert('Les données sauvegardées ont été chargées.');
             return true;
         }
         return false;
     };
     
+    const clearData = () => {
+        localStorage.removeItem('primeReductionData');
+        // This is a soft reset, consider a hard reset by reloading the page
+        Object.values(elements).forEach(el => {
+            if (el.tagName === 'INPUT' || el.tagName === 'SELECT') {
+                if(el.type !== 'submit' && el.type !== 'button') {
+                     // Maybe reset to default values instead of blank
+                     if (el.id === 'annee-calcul') el.value = DEFAULT_YEAR;
+                     else if (el.matches('select')) el.selectedIndex = 0;
+                     else el.value = el.id.includes('nombre') ? '0' : '';
+                }
+            }
+        });
+        updateDeterminantTable();
+        resetResults();
+    }
+
     // --- Event Handlers ---
     const printHandler = () => window.print();
 
@@ -283,9 +308,215 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+
+    // --- ASSISTANT (WIZARD) LOGIC ---
+    const assistant = {
+        modal: document.getElementById('assistant-modal'),
+        title: document.getElementById('assistant-title'),
+        helpText: document.getElementById('assistant-help-text'),
+        inputContainer: document.getElementById('assistant-input-container'),
+        validationError: document.getElementById('assistant-validation-error'),
+        progressBar: document.getElementById('assistant-progress-bar'),
+        prevBtn: document.getElementById('assistant-prev-btn'),
+        nextBtn: document.getElementById('assistant-next-btn'),
+        skipBtn: document.getElementById('assistant-skip-btn'),
+        
+        steps: [],
+        currentStepIndex: 0,
+        skippedSteps: new Set(),
+        isActive: false,
+        originalParents: new Map(),
+
+        init() {
+            this.defineSteps();
+            document.getElementById('start-assistant-btn').addEventListener('click', () => this.start());
+            document.getElementById('close-assistant-btn').addEventListener('click', () => this.close());
+            this.prevBtn.addEventListener('click', () => this.prevStep());
+            this.nextBtn.addEventListener('click', () => this.nextStep());
+            this.skipBtn.addEventListener('click', () => this.skipStep());
+            
+            // Toast notification logic
+            const toast = document.getElementById('toast-notification');
+            if (localStorage.getItem('primeReductionData')) {
+                toast.style.display = 'flex';
+            }
+            document.getElementById('toast-load-yes').addEventListener('click', () => {
+                loadData();
+                updateDeterminantTable();
+                toast.style.display = 'none';
+            });
+            document.getElementById('toast-load-no').addEventListener('click', () => {
+                clearData();
+                toast.style.display = 'none';
+            });
+        },
+        
+        defineSteps() {
+            const isPositiveNumber = (value) => {
+                const num = parseFloat(value);
+                return !isNaN(num) && num >= 0;
+            };
+
+            const stepElements = Array.from(document.querySelectorAll('[data-step-id]'));
+            this.steps = stepElements.map(container => {
+                const stepId = container.dataset.stepId;
+                const labelEl = container.querySelector('label') || container.querySelector('td');
+                const inputEl = document.getElementById(stepId);
+                const helpEl = container.querySelector('.help-tooltip');
+                
+                let validationFn = (value) => value !== ''; // Default validation
+                let validationMsg = "Ce champ ne peut pas être vide.";
+
+                if (inputEl.id.startsWith('nombre-')) {
+                    validationFn = isPositiveNumber;
+                    validationMsg = "Veuillez entrer un nombre positif (0 ou plus).";
+                }
+                if (inputEl.id === 'nombre-adultes') {
+                    validationFn = (value) => parseFloat(value) >= 1;
+                    validationMsg = "Le nombre d'adultes doit être d'au moins 1.";
+                }
+                if(inputEl.id !== 'fortune-imposable' && (inputEl.type === 'text' && !inputEl.id.startsWith('nombre'))){
+                    validationFn = isPositiveNumber;
+                    validationMsg = "Veuillez entrer un montant positif.";
+                }
+
+                return {
+                    id: stepId,
+                    element: inputEl,
+                    wrapper: container.querySelector('.input-wrapper') || container.querySelector('td.input-wrapper'),
+                    title: labelEl.textContent,
+                    help: helpEl ? helpEl.dataset.tooltip : "Aucune aide disponible pour ce champ.",
+                    validate: validationFn,
+                    validationMessage: validationMsg,
+                    isCritical: inputEl.id === 'nombre-adultes'
+                };
+            });
+        },
+
+        start() {
+            if (this.steps.length === 0) return;
+            this.isActive = true;
+            this.currentStepIndex = 0;
+            this.skippedSteps.clear();
+            this.originalParents.clear();
+            this.modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            this.renderStep();
+        },
+
+        close() {
+            this.isActive = false;
+            this.modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            // Restore the last element to its original place
+            if (this.originalParents.size > 0) {
+                 const lastStep = this.steps[this.currentStepIndex];
+                 if (lastStep && this.originalParents.has(lastStep.wrapper)) {
+                    this.originalParents.get(lastStep.wrapper).appendChild(lastStep.wrapper);
+                 }
+            }
+            updateDeterminantTable();
+        },
+
+        renderStep() {
+            const step = this.steps[this.currentStepIndex];
+            if (!step) return;
+            
+            this.title.textContent = `${step.title} (${this.currentStepIndex + 1}/${this.steps.length})`;
+            this.helpText.textContent = step.help;
+            this.validationError.style.display = 'none';
+
+            // Move the input wrapper into the modal
+            if (!this.originalParents.has(step.wrapper)) {
+                this.originalParents.set(step.wrapper, step.wrapper.parentNode);
+            }
+            this.inputContainer.innerHTML = '';
+            this.inputContainer.appendChild(step.wrapper);
+            step.element.focus();
+
+            // Update buttons
+            this.prevBtn.style.display = this.currentStepIndex > 0 ? 'block' : 'none';
+            this.skipBtn.style.display = step.isCritical ? 'none' : 'block';
+            this.nextBtn.textContent = this.currentStepIndex === this.steps.length - 1 && this.skippedSteps.size === 0 ? "Terminer" : "Suivant";
+
+            this.renderProgressBar();
+        },
+        
+        renderProgressBar() {
+            this.progressBar.innerHTML = '';
+            this.steps.forEach((step, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                if (index === this.currentStepIndex) {
+                    dot.classList.add('current');
+                } else if (this.skippedSteps.has(index)) {
+                    dot.classList.add('skipped');
+                } else if (step.validate(step.element.value)) {
+                    dot.classList.add('answered');
+                }
+                this.progressBar.appendChild(dot);
+            });
+        },
+
+        nextStep() {
+            const step = this.steps[this.currentStepIndex];
+            if (!step.validate(step.element.value)) {
+                this.validationError.textContent = step.validationMessage;
+                this.validationError.style.display = 'block';
+                return;
+            }
+
+            this.skippedSteps.delete(this.currentStepIndex); // Mark as answered
+            saveData(); // Save after each successful step
+
+            if (this.currentStepIndex < this.steps.length - 1) {
+                this.currentStepIndex++;
+            } else {
+                // End of the line, check for skipped steps
+                const nextSkipped = this.skippedSteps.values().next().value;
+                if (nextSkipped !== undefined) {
+                    this.currentStepIndex = nextSkipped;
+                } else {
+                    this.close();
+                    calculateResults(); // All questions answered
+                    return;
+                }
+            }
+            this.renderStep();
+        },
+
+        prevStep() {
+            if (this.currentStepIndex > 0) {
+                this.currentStepIndex--;
+                this.renderStep();
+            }
+        },
+
+        skipStep() {
+            const step = this.steps[this.currentStepIndex];
+            if (step.isCritical) return;
+
+            this.skippedSteps.add(this.currentStepIndex);
+            
+            if (this.currentStepIndex < this.steps.length - 1) {
+                this.currentStepIndex++;
+            } else {
+                 const nextSkipped = Array.from(this.skippedSteps).find(i => i !== this.currentStepIndex);
+                 if (nextSkipped !== undefined) {
+                    this.currentStepIndex = nextSkipped;
+                 } else {
+                    this.close();
+                    return;
+                 }
+            }
+            this.renderStep();
+        }
+    };
+
     // --- Initialization ---
     const init = async () => {
         await handleDataLoadingAndRecalculate();
+        assistant.init();
 
         // Attach event listeners
         Object.values(elements).forEach(el => {
@@ -301,10 +532,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         elements.calculateBtn.addEventListener('click', calculateResults);
         elements.printBtn.addEventListener('click', printHandler);
-        elements.saveBtn.addEventListener('click', saveData);
+        elements.saveBtn.addEventListener('click', () => {
+            saveData();
+            alert('Vos données ont été sauvegardées localement.');
+        });
         elements.loadBtn.addEventListener('click', async () => {
-            loadData();
-            await handleDataLoadingAndRecalculate(); // Reload data for the year now in the input
+            if(loadData()){
+                await handleDataLoadingAndRecalculate();
+                alert('Les données sauvegardées ont été chargées.');
+            } else {
+                alert('Aucune donnée sauvegardée trouvée.');
+            }
         });
     };
 

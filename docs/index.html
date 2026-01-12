@@ -8,6 +8,38 @@
 </head>
 <body>
 
+    <!-- Assistant Modal -->
+    <div id="assistant-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="assistant-title">Assistant de Saisie</h2>
+                <button id="close-assistant-btn" class="close-button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="assistant-help-text">Laissez-vous guider pour remplir les champs correctement.</p>
+                <div id="assistant-input-container">
+                    <!-- Le champ de formulaire actuel sera injecté ici -->
+                </div>
+                <div id="assistant-validation-error" class="validation-error" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <div id="assistant-progress-bar"></div>
+                <div class="assistant-buttons">
+                    <button id="assistant-prev-btn">Précédent</button>
+                    <button id="assistant-skip-btn">Plus tard</button>
+                    <button id="assistant-next-btn">Suivant</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification for Saved Data -->
+    <div id="toast-notification" class="toast" style="display: none;">
+        <p>Des données sauvegardées ont été trouvées. Voulez-vous les charger ?</p>
+        <button id="toast-load-yes">Oui</button>
+        <button id="toast-load-no">Non, commencer à zéro</button>
+    </div>
+
     <div class="container">
         <header>
             <h1>Calculateur de Réduction des Primes</h1>
@@ -16,44 +48,60 @@
 
         <main>
             <div class="calculator">
+                <div class="assistant-banner">
+                    <p>Besoin d'aide ? Utilisez notre assistant pour vous guider pas à pas.</p>
+                    <button id="start-assistant-btn">Démarrer l'Assistant</button>
+                </div>
                 <!-- Section Situation Personnelle -->
                 <section class="input-section">
                     <h2><span class="section-number">1</span>Situation Personnelle</h2>
-                    <div class="form-row">
+                    <div class="form-row" data-step-id="annee-calcul">
                         <label for="annee-calcul">Année de calcul</label>
-                        <input type="text" id="annee-calcul" value="2026" min="2020">
-                        <span class="help-tooltip" data-tooltip="Année pour laquelle la réduction est calculée. Les données de base (primes, etc.) seront chargées pour cette année.">?</span>
+                        <div class="input-wrapper">
+                            <input type="text" id="annee-calcul" value="2026" min="2020">
+                            <span class="help-tooltip" data-tooltip="Année pour laquelle la réduction est calculée. Les données de base (primes, etc.) seront chargées pour cette année.">?</span>
+                        </div>
                     </div>
-                    <div class="form-row">
+                    <div class="form-row" data-step-id="statut-civil">
                         <label for="statut-civil">Statut civil</label>
-                        <select id="statut-civil">
-                            <option value="single">Célibataire / Divorcé(e) / Veuf(ve) / Séparé(e)</option>
-                            <option value="married">Couple marié</option>
-                        </select>
-                        <span class="help-tooltip" data-tooltip="Sélectionnez votre état civil actuel.">?</span>
+                        <div class="input-wrapper">
+                            <select id="statut-civil">
+                                <option value="single">Célibataire / Divorcé(e) / Veuf(ve) / Séparé(e)</option>
+                                <option value="married">Couple marié</option>
+                            </select>
+                            <span class="help-tooltip" data-tooltip="Sélectionnez votre état civil actuel.">?</span>
+                        </div>
                     </div>
-                    <div class="form-row">
+                    <div class="form-row" data-step-id="region">
                         <label for="region">Région</label>
-                        <select id="region">
-                            <option value="1">Région 1 (Sarine)</option>
-                            <option value="2">Région 2 (Autres districts)</option>
-                        </select>
-                        <span class="help-tooltip" data-tooltip="La prime moyenne varie selon la région de domicile.">?</span>
+                        <div class="input-wrapper">
+                            <select id="region">
+                                <option value="1">Région 1 (Sarine)</option>
+                                <option value="2">Région 2 (Autres districts)</option>
+                            </select>
+                            <span class="help-tooltip" data-tooltip="La prime moyenne varie selon la région de domicile.">?</span>
+                        </div>
                     </div>
-                    <div class="form-row">
+                    <div class="form-row" data-step-id="nombre-adultes">
                         <label for="nombre-adultes">Nombre d'adultes (>25 ans)</label>
-                        <input type="text" id="nombre-adultes" value="0" min="0">
-                        <span class="help-tooltip" data-tooltip="Nombre d'adultes de plus de 25 ans dans le ménage.">?</span>
+                        <div class="input-wrapper">
+                            <input type="text" id="nombre-adultes" value="0" min="0">
+                            <span class="help-tooltip" data-tooltip="Nombre d'adultes de plus de 25 ans dans le ménage.">?</span>
+                        </div>
                     </div>
-                    <div class="form-row">
+                    <div class="form-row" data-step-id="nombre-jeunes">
                         <label for="nombre-jeunes">Nombre de jeunes adultes (19-25 ans)</label>
-                        <input type="text" id="nombre-jeunes" value="0" min="0">
-                        <span class="help-tooltip" data-tooltip="Nombre de jeunes adultes en formation entre 19 et 25 ans.">?</span>
+                        <div class="input-wrapper">
+                             <input type="text" id="nombre-jeunes" value="0" min="0">
+                            <span class="help-tooltip" data-tooltip="Nombre de jeunes adultes en formation entre 19 et 25 ans.">?</span>
+                        </div>
                     </div>
-                    <div class="form-row">
+                    <div class="form-row" data-step-id="nombre-enfants">
                         <label for="nombre-enfants">Nombre d'enfants (0-18 ans)</label>
-                        <input type="text" id="nombre-enfants" value="0" min="0">
-                        <span class="help-tooltip" data-tooltip="Nombre d'enfants jusqu'à 18 ans.">?</span>
+                        <div class="input-wrapper">
+                            <input type="text" id="nombre-enfants" value="0" min="0">
+                            <span class="help-tooltip" data-tooltip="Nombre d'enfants jusqu'à 18 ans.">?</span>
+                        </div>
                     </div>
                 </section>
 
@@ -75,91 +123,91 @@
                         </thead>
                         <tbody>
                             <!-- Revenu Net -->
-                            <tr>
+                            <tr data-step-id="revenu-net">
                                 <td>Revenu net</td>
                                 <td>4.910</td>
-                                <td><input type="text" id="revenu-net" placeholder="0"></td>
+                                <td class="input-wrapper"><input type="text" id="revenu-net" placeholder="0"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-revenu-net">0 CHF</td>
                                 <td class="cell-help"><span class="help-tooltip" data-tooltip="Revenu net selon votre dernière taxation fiscale.">?</span></td>
                             </tr>
                             <!-- Primes caisse-maladie et accidents -->
-                            <tr>
+                            <tr data-step-id="caisse-maladie">
                                 <td>Primes caisse-maladie et accidents</td>
                                 <td>4.110</td>
-                                <td><input type="text" id="caisse-maladie" placeholder="0"></td>
+                                <td class="input-wrapper"><input type="text" id="caisse-maladie" placeholder="0"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-caisse-maladie">0 CHF</td>
                                 <td class="cell-help"><span class="help-tooltip" data-tooltip="Montant de vos primes LAMal et LAA.">?</span></td>
                             </tr>
                             <!-- Réduction de prime -->
-                            <tr>
+                            <tr data-step-id="reduction-prime">
                                 <td>Réduction de prime</td>
                                 <td>4.115</td>
-                                <td><input type="text" id="reduction-prime" placeholder="0"></td>
+                                <td class="input-wrapper"><input type="text" id="reduction-prime" placeholder="0"></td>
                                 <td class="operator minus">-</td>
                                 <td class="determinant-value" id="determinant-reduction-prime">0 CHF</td>
                                 <td class="cell-help"><span class="help-tooltip" data-tooltip="Montant de la réduction de prime déjà reçue ou attendue. Ce montant est déduit du revenu déterminant.">?</span></td>
                             </tr>
                             <!-- Autres primes et cotisations (pilier 3b) -->
-                            <tr>
+                            <tr data-step-id="autres-primes">
                                 <td>Autres primes et cotisations (3b)</td>
                                 <td>4.120</td>
-                                <td><input type="text" id="autres-primes" placeholder="0"></td>
+                                <td class="input-wrapper"><input type="text" id="autres-primes" placeholder="0"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-autres-primes">0 CHF</td>
                                 <td class="cell-help"><span class="help-tooltip" data-tooltip="Primes d'assurances vie et rentes (pilier 3b).">?</span></td>
                             </tr>
                             <!-- Prévoyance liée (pilier 3a) conjoint -->
-                            <tr>
+                            <tr data-step-id="prevoyance-conjoint">
                                 <td>Prévoyance liée (3a) conjoint</td>
                                 <td>4.130</td>
-                                <td><input type="text" id="prevoyance-conjoint" placeholder="0"></td>
+                                <td class="input-wrapper"><input type="text" id="prevoyance-conjoint" placeholder="0"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-prevoyance-conjoint">0 CHF</td>
                                 <td class="cell-help"><span class="help-tooltip" data-tooltip="Cotisations au 3ème pilier A pour le premier conjoint.">?</span></td>
                             </tr>
                             <!-- Prévoyance liée (pilier 3a) conjointe -->
-                            <tr>
+                            <tr data-step-id="prevoyance-conjointe">
                                 <td>Prévoyance liée (3a) conjointe</td>
                                 <td>4.130</td>
-                                <td><input type="text" id="prevoyance-conjointe" placeholder="0"></td>
+                                <td class="input-wrapper"><input type="text" id="prevoyance-conjointe" placeholder="0"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-prevoyance-conjointe">0 CHF</td>
                                 <td class="cell-help"><span class="help-tooltip" data-tooltip="Cotisations au 3ème pilier A pour la seconde conjointe.">?</span></td>
                             </tr>
                             <!-- Rachat d'années d'assurance (2ème pilier) -->
-                            <tr>
+                            <tr data-step-id="rachat-assurance">
                                 <td>Rachat d'années d'assurance (2e pilier)</td>
                                 <td>4.140</td>
-                                <td><input type="text" id="rachat-assurance" placeholder="0"></td>
+                                <td class="input-wrapper"><input type="text" id="rachat-assurance" placeholder="0"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-rachat-assurance">0 CHF</td>
                                 <td class="cell-help"><span class="help-tooltip" data-tooltip="Rachats d'années LPP. La part excédant 15'000 CHF est ajoutée.">?</span></td>
                             </tr>
                             <!-- Intérêts passifs privés -->
-                            <tr>
+                            <tr data-step-id="interets-passifs">
                                 <td>Intérêts passifs privés</td>
                                 <td>4.210</td>
-                                <td><input type="text" id="interets-passifs" placeholder="0"></td>
+                                <td class="input-wrapper"><input type="text" id="interets-passifs" placeholder="0"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-interets-passifs">0 CHF</td>
                                 <td class="cell-help"><span class="help-tooltip" data-tooltip="Seule la part des intérêts qui dépasse 30'000 CHF est ajoutée.">?</span></td>
                             </tr>
                             <!-- Frais d'entretien d'immeubles privés -->
-                            <tr>
+                            <tr data-step-id="frais-immeubles">
                                 <td>Frais d'entretien d'immeubles</td>
                                 <td>4.310</td>
-                                <td><input type="text" id="frais-immeubles" placeholder="0"></td>
+                                <td class="input-wrapper"><input type="text" id="frais-immeubles" placeholder="0"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-frais-immeubles">0 CHF</td>
                                 <td class="cell-help"><span class="help-tooltip" data-tooltip="Seule la part des frais qui dépasse 15'000 CHF est ajoutée.">?</span></td>
                             </tr>
                             <!-- Fortune imposable -->
-                            <tr>
+                            <tr data-step-id="fortune-imposable">
                                 <td>Fortune imposable</td>
                                 <td>7.910</td>
-                                <td><input type="text" id="fortune-imposable" placeholder="0"></td>
+                                <td class="input-wrapper"><input type="text" id="fortune-imposable" placeholder="0"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-fortune-imposable">0 CHF</td>
                                 <td class="cell-help"><span class="help-tooltip" data-tooltip="1/20ème de la fortune est ajouté. Une fortune négative est comptée comme 0.">?</span></td>
