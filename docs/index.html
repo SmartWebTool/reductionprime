@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculateur de Réduction des Primes</title>
+    <title>Calculateur de réduction de primes</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -35,14 +35,14 @@
     
     <!-- Toast Notification for Saved Data -->
     <div id="toast-notification" class="toast" style="display: none;">
-        <p>Des données sauvegardées ont été trouvées. Voulez-vous les charger ?</p>
+        <p>Des données sauvegardées précédemment ont été trouvées. Voulez-vous les charger ?</p>
         <button id="toast-load-yes">Oui</button>
         <button id="toast-load-no">Non, commencer à zéro</button>
     </div>
 
     <div class="container">
         <header>
-            <h1>Calculateur de Réduction des Primes</h1>
+            <h1>Calculateur de réduction de primes</h1>
             <p>Estimez votre droit à une réduction des primes d'assurance-maladie pour le canton de Fribourg.</p>
         </header>
 
@@ -79,14 +79,14 @@
                                 <option value="1">Région 1 (Sarine)</option>
                                 <option value="2">Région 2 (Autres districts)</option>
                             </select>
-                            <span class="help-tooltip" data-tooltip="La prime moyenne varie selon la région de domicile.">?</span>
+                            <span class="help-tooltip" data-tooltip="La prime moyenne de base pour le calcul varie selon le district du domicile.">?</span>
                         </div>
                     </div>
                     <div class="form-row" data-step-id="nombre-adultes">
                         <label for="nombre-adultes">Nombre d'adultes (>25 ans)</label>
                         <div class="input-wrapper">
                             <input type="text" id="nombre-adultes" value="0" min="0">
-                            <span class="help-tooltip" data-tooltip="Nombre d'adultes de plus de 25 ans dans le ménage.">?</span>
+                            <span class="help-tooltip" data-tooltip="Nombre d'adultes parents dans le ménage.">?</span>
                         </div>
                     </div>
                     <div class="form-row" data-step-id="nombre-jeunes">

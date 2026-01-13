@@ -1,0 +1,37 @@
+User feedback:
+I received feedback on the usability of the prime reduction calculator. Some users (first time users) often miss some value fields by using the calculator.
+
+A first problem, they missed the Nombre d'adultes. Since the default value is 0, the calculator run without any warning and give a result, which is wrong because there should be at least 1 adult.
+
+A second problem is tnat the user miss the help symbol for any fields (?) and do not understand which value they should enter.
+
+A third problem is that they begin to  fillup the form, then store the entered values, then the next day they restore the memorized values and continue to fillup the form, missing some fields (they jump some  questions over). The calculate give then incorrect results.
+
+Solution Proposal:
+My idea is to implement an assistant, like a person who fillup the form by asking the user questions and explaining which answer is expected. The assistant takes all the form fields one after another and asks the user for a value or a selection (couple marié ou célibataire, etc.) and explain the value to be entered.
+
+Assistant Workflow:
+1. When the calculator is launched, the assistant check if previous values were allready entered and asks the user if he want to restore these values or delete these one.
+2. The assistant take the first form field and display a popup window with 4 parts:
+2.1 Part 1 : the prompt corresponding to the field label or Rubrique&Code, ie Statut civil
+2.2 Part 2: the explanation corresponding to the content of the contextual help
+2.3 Part 3: an input field to enter a value (ie 50000) or a combobox to make a selection (ie célibataire / marié).
+2.4 Part 4: button "Suivant" to go to the next question; button "Effacer" to cancel the value and allowing to enter a new value; button "Plus tard" to allow the user to skip the question and respond to it the next round
+3. The user read the question prompt, read the explanation text, check the previous entered answer or tip the answer or select an option, then click the button "Suivant"
+4. The assistant check the tipped answer and warn the user if the value is incorrect, ie text rather number or negative number rather than positive (exception for field 7.910 which could have negative value equivalent to a debt rather than a fortune).
+5. When the assistant comes to the last question, it jumps to the previous skipped answer till all questions are answered.
+6. When all questions are answered, the assistant propose to calculate the result with the button Calculer
+7. The result layout is exactly the current one. The form layout can be printed with the button "Imprimer"
+8. For the questions of section 1, the prompt correspond to the field label
+9. For the questions of section 2, the prompt correspond to the field "Rubrique" and the field "Code"
+10. The answers are stored locally each time the user enter a response. When the calculator is launched, the stored values are proposed to the user. He can then decide to use these values or cancel the values.
+11. At each calculator launch, the questions are taken sequentially beginning with the first question. This rule apply also when the stored values are taken into account. The prompt, explanation and value are displayed. The user can then decide if he want to keep the stored value or cancel the value and reenter a  new one.
+
+
+Instructions for gemini:
+1. Confirm and synthetise the problems encountered
+2. Confirm the assistant solution
+3. Ask for precisions when solution miss some points or is difficult to implement
+4. Propose improvements to the assistant : user friendliness, ease of implementation in vanilla javascript (avoid libraries)
+5. Wait for implementation acceptance
+6. Implement solution
