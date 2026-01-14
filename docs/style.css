@@ -669,3 +669,13 @@ select {
     .result-value { font-weight: bold; text-align: right; }
     .reduction-breakdown-table tfoot td { font-weight: bold !important; }
 }
+
+/* --- Input Validation Styles --- */
+.input-error {
+    border-color: var(--danger-color) !important;
+}
+
+.input-error::placeholder {
+    color: var(--danger-color);
+    opacity: 0.8;
+}
