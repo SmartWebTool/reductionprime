@@ -26,14 +26,25 @@ document.addEventListener('DOMContentLoaded', () => {
         'start-assistant-btn', 'assistant-modal', 'assistant-title', 'assistant-help-text', 'assistant-input-container',
         'assistant-validation-error', 'assistant-prev-btn', 'assistant-next-btn', 'close-assistant-btn'
     ];
-    allElementIds.forEach(id => { elements[id] = document.getElementById(id); });
+    allElementIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            elements[id] = el;
+        } else {
+            console.warn(`Element with ID '${id}' not found.`);
+        }
+    });
 
     const validationBanner = document.createElement('div');
     validationBanner.id = 'validation-error-banner';
     validationBanner.className = 'validation-error';
     validationBanner.style.display = 'none';
-    document.querySelector('.input-section').querySelector('h2').after(validationBanner);
+    const firstSectionH2 = document.querySelector('.input-section > h2');
+    if (firstSectionH2) {
+        firstSectionH2.after(validationBanner);
+    }
     elements.validationErrorBanner = validationBanner;
+
 
     // --- CORE UI & VALIDATION ---
     const clearResults = () => {
@@ -71,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     };
 
+
     // --- DATA & CALCULATION ---
     const parseInput = id => {
         const value = String(elements[id]?.value || '0').replace(/['\s]/g, '');
@@ -93,16 +105,13 @@ document.addEventListener('DOMContentLoaded', () => {
             fortuneImposable: Math.max(0, parseInput('fortune-imposable')) / 20,
         };
 
-        // BUGFIX: Correctly map camelCase keys to kebab-case element IDs.
         Object.entries(determinants).forEach(([key, value]) => {
             const elId = `determinant-${key.replace(/([A-Z])/g, "-$1").toLowerCase()}`;
-            if (elements[elId]) {
-                elements[elId].textContent = formatCurrency(value);
-            }
+            if (elements[elId]) elements[elId].textContent = formatCurrency(value);
         });
 
         const total = Object.values(determinants).reduce((sum, val) => sum + val, 0);
-        elements.totalDeterminantSum.textContent = formatCurrency(total);
+        if (elements.totalDeterminantSum) elements.totalDeterminantSum.textContent = formatCurrency(total);
         return total;
     };
     
@@ -154,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const reductionRatePercent = rateEntry ? rateEntry.taux_applique_prime_moyenne_percent : 0;
         elements.tauxReductionApplicable.textContent = `${reductionRatePercent.toFixed(2)} %`;
 
-        // Display breakdown
         const { config } = csvData;
         const premiums = {
             adult: situation.region === 1 ? config.pm_adulte_reg1 : config.pm_adulte_reg2,
@@ -182,6 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.breakdownBody.innerHTML = breakdownHTML;
         elements.breakdownFoot.innerHTML = `<tr><td colspan="3">Total Réductions</td><td>${formatCurrency(totalAnnualReduction)}</td></tr>`;
     };
+
 
     // --- DATA LOADING & STORAGE ---
     const loadDataForYear = async (year) => {
@@ -221,35 +230,39 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const handleStorageBanner = () => {
-        if (!localStorage.getItem(LOCAL_STORAGE_KEY)) return;
+        if (!localStorage.getItem(LOCAL_STORAGE_KEY) || !elements['toast-notification']) return;
         elements['toast-notification'].style.display = 'flex';
         elements['toast-load-yes'].addEventListener('click', () => { loadData(); elements['toast-notification'].style.display = 'none'; }, { once: true });
         elements['toast-load-no'].addEventListener('click', () => { localStorage.removeItem(LOCAL_STORAGE_KEY); elements['toast-notification'].style.display = 'none'; }, { once: true });
     };
 
-    // --- ASSISTANT LOGIC (REFACTORED) ---
+
+    // --- ASSISTANT LOGIC (REFACTORED & ROBUST) ---
     const assistant = {
         steps: [],
         currentStepIndex: 0,
-        clone: null, // To hold the cloned input element
+        clone: null,
         
         init() {
             this.steps = formInputIds.map(id => {
                 const el = elements[id];
+                if (!el) return null;
                 const container = el.closest('.form-row, tr');
                 return {
                     id,
                     title: container?.querySelector('label, td:first-child')?.textContent.trim() || id,
                     help: container?.querySelector('.help-tooltip')?.dataset.tooltip || "Veuillez saisir la valeur pour ce champ."
                 };
-            });
-            elements.startAssistantBtn.addEventListener('click', () => this.start());
-            elements.closeAssistantBtn.addEventListener('click', () => this.close());
-            elements.assistantPrevBtn.addEventListener('click', () => this.prevStep());
-            elements.assistantNextBtn.addEventListener('click', () => this.nextStep());
+            }).filter(Boolean); // Filter out null steps if element not found
+
+            if (elements.startAssistantBtn) elements.startAssistantBtn.addEventListener('click', () => this.start());
+            if (elements.closeAssistantBtn) elements.closeAssistantBtn.addEventListener('click', () => this.close());
+            if (elements.assistantPrevBtn) elements.assistantPrevBtn.addEventListener('click', () => this.prevStep());
+            if (elements.assistantNextBtn) elements.assistantNextBtn.addEventListener('click', () => this.nextStep());
         },
 
         start() {
+            if (this.steps.length === 0) return;
             this.currentStepIndex = 0;
             document.body.classList.add('assistant-active');
             elements.assistantNextBtn.disabled = false;
@@ -259,15 +272,14 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         close() {
-            // On close, ensure the last value from the clone is copied back to the original element
             if (this.clone) {
                 const lastStepId = this.steps[this.currentStepIndex].id;
                 elements[lastStepId].value = this.clone.value;
             }
             document.body.classList.remove('assistant-active');
             elements.assistantModal.style.display = 'none';
-            elements.assistantInputContainer.innerHTML = ''; // Clean up
-            calculateDeterminantIncome(); // Refresh determinant values
+            if (elements.assistantInputContainer) elements.assistantInputContainer.innerHTML = '';
+            calculateDeterminantIncome();
         },
         
         renderStep() {
@@ -276,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this.clone = originalElement.cloneNode(true);
             this.clone.addEventListener('input', () => {
-                elements.assistantValidationError.style.display = 'none';
+                if (elements.assistantValidationError) elements.assistantValidationError.style.display = 'none';
             });
 
             elements.assistantTitle.textContent = `${step.title} (${this.currentStepIndex + 1}/${this.steps.length})`;
@@ -296,7 +308,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 elements.assistantValidationError.style.display = 'block';
                 return;
             }
-            // Copy value from clone to original element
             elements[this.steps[this.currentStepIndex].id].value = this.clone.value;
 
             if (this.currentStepIndex === this.steps.length - 1) {
@@ -311,7 +322,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         prevStep() {
             if (this.currentStepIndex > 0) {
-                // Copy value back before going back
                 elements[this.steps[this.currentStepIndex].id].value = this.clone.value;
                 this.currentStepIndex--;
                 this.renderStep();
@@ -319,34 +329,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+
     // --- INITIALIZATION ---
     const init = async () => {
-        elements.calculateBtn.addEventListener('click', calculateAndDisplayResults);
-        elements.saveBtn.addEventListener('click', saveData);
-        elements.printBtn.addEventListener('click', () => window.print());
+        // Ensure all critical elements exist before adding listeners
+        if (elements.calculateBtn) elements.calculateBtn.addEventListener('click', calculateAndDisplayResults);
+        if (elements.saveBtn) elements.saveBtn.addEventListener('click', saveData);
+        if (elements.printBtn) elements.printBtn.addEventListener('click', () => window.print());
         
-        document.querySelector('.container').addEventListener('input', e => {
-            if (areListenersActive && e.target.id !== 'annee-calcul') {
-                if(document.body.classList.contains('assistant-active')) return; // Don't run if assistant is active
+        const container = document.querySelector('.container');
+        if (container) {
+            container.addEventListener('input', e => {
+                if (areListenersActive && e.target.id !== 'annee-calcul') {
+                    if (document.body.classList.contains('assistant-active')) return;
+                    clearResults();
+                    calculateDeterminantIncome();
+                    if (e.target.classList.contains('input-error')) {
+                        e.target.classList.remove('input-error');
+                    }
+                }
+            });
+        }
+        
+        if (elements['annee-calcul']) {
+            elements['annee-calcul'].addEventListener('change', async () => {
+                clearValidationErrors();
+                const year = elements['annee-calcul'].value;
+                if (!await loadDataForYear(year)) {
+                    alert(`Données non trouvées pour l'année ${year}. Retour à ${DEFAULT_YEAR}.`);
+                    elements['annee-calcul'].value = DEFAULT_YEAR;
+                    await loadDataForYear(DEFAULT_YEAR);
+                }
                 clearResults();
                 calculateDeterminantIncome();
-                if (e.target.classList.contains('input-error')) {
-                    e.target.classList.remove('input-error');
-                }
-            }
-        });
-
-        elements['annee-calcul'].addEventListener('change', async () => {
-            clearValidationErrors();
-            const year = elements['annee-calcul'].value;
-            if (!await loadDataForYear(year)) {
-                alert(`Données non trouvées pour l'année ${year}. Retour à ${DEFAULT_YEAR}.`);
-                elements['annee-calcul'].value = DEFAULT_YEAR;
-                await loadDataForYear(DEFAULT_YEAR);
-            }
-            clearResults();
-            calculateDeterminantIncome();
-        });
+            });
+        }
 
         assistant.init();
         handleStorageBanner();
@@ -355,5 +372,8 @@ document.addEventListener('DOMContentLoaded', () => {
         calculateDeterminantIncome();
     };
 
-    init();
+    init().catch(error => {
+        console.error("An error occurred during initialization:", error);
+        alert("Une erreur critique est survenue lors du chargement de l'application. Veuillez rafraîchir la page.");
+    });
 });
