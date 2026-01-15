@@ -679,3 +679,7 @@ select {
     color: var(--danger-color);
     opacity: 0.8;
 }
+
+body.assistant-active .help-tooltip {
+    display: none;
+}
