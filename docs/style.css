@@ -94,12 +94,14 @@ input[type="text"], select {
     padding: 8px;
     border: 1px solid var(--medium-gray);
     border-radius: 4px;
-    width: 120px;
     font-size: 1em;
+    flex-grow: 1; /* Allow input to grow */
+    width: 100%; /* Take up available width */
+    box-sizing: border-box;
 }
 
 select {
-    width: auto;
+    width: auto; /* Allow select to size to content */
     flex-grow: 1;
 }
 
@@ -124,6 +126,7 @@ select {
     padding: 8px 10px;
     border: none;
     border-radius: 0;
+    width: 100%;
 }
 
 .cell-help {
@@ -158,7 +161,7 @@ select {
 .determinant-value {
     font-weight: bold;
     text-align: right;
-    background-color: var(--light-gray);
+    background-color: transparent; /* Changed for better mobile view */
 }
 
 .determinant-table tfoot .total-label {
@@ -189,6 +192,7 @@ select {
     font-weight: bold;
     line-height: 20px;
     flex-shrink: 0; /* Prevent shrinking in flex layouts */
+    position: relative; /* Ensure proper positioning of pseudo-element */
 }
 
 .help-tooltip:before {
