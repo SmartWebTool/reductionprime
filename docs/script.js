@@ -230,15 +230,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const assistant = {
         steps: [],
         currentStepIndex: 0,
-        
+        currentClonedInput: null,
+
         init() {
             this.steps = formInputIds.map(id => {
                 const el = elements[id];
                 if (!el) return null;
                 const container = el.closest('.form-row, tr');
+                let title = id;
+                if (container) {
+                    if (container.tagName === 'TR') { // Section 2 table row
+                        const cells = container.querySelectorAll('td');
+                        if (cells.length > 1 && cells[1].textContent.trim()) {
+                            title = `${cells[0].textContent.trim()} - ${cells[1].textContent.trim()}`;
+                        } else {
+                            title = cells[0].textContent.trim();
+                        }
+                    } else { // Section 1 form row
+                        const label = container.querySelector('label');
+                        if (label) {
+                            title = label.textContent.trim();
+                        }
+                    }
+                }
+
                 return {
                     id,
-                    title: container?.querySelector('label, td:first-child')?.textContent.trim() || id,
+                    title,
                     help: container?.querySelector('.help-tooltip')?.dataset.tooltip || "Veuillez saisir la valeur pour ce champ."
                 };
             }).filter(Boolean);
@@ -253,6 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         start() {
             if (this.steps.length === 0 || !elements['assistant-modal']) return;
             this.currentStepIndex = 0;
+            this.currentClonedInput = null;
             elements['assistant-next-btn'].disabled = false;
             elements['assistant-prev-btn'].disabled = false;
             elements['assistant-modal'].style.display = 'flex';
@@ -260,7 +279,20 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         close() {
+            this.updateOriginalInput();
             if (elements['assistant-modal']) elements['assistant-modal'].style.display = 'none';
+            this.currentClonedInput = null;
+        },
+
+        updateOriginalInput() {
+            if (this.currentClonedInput && this.currentStepIndex < this.steps.length) {
+                const step = this.steps[this.currentStepIndex];
+                const originalElement = elements[step.id];
+                if (originalElement && originalElement.value !== this.currentClonedInput.value) {
+                    originalElement.value = this.currentClonedInput.value;
+                    originalElement.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
         },
         
         renderStep() {
@@ -271,19 +303,27 @@ document.addEventListener('DOMContentLoaded', () => {
             elements['assistant-help-text'].textContent = step.help;
             elements['assistant-validation-error'].style.display = 'none';
             
-            // Simple focus method
-            originalElement.focus();
-            originalElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const container = elements['assistant-input-container'];
+            container.innerHTML = '';
 
-            elements['assistant-input-container'].innerHTML = `<p><i>Le champ de saisie est mis en évidence sur la page principale.</i></p>`;
+            const clonedElement = originalElement.cloneNode(true);
+            clonedElement.id = `assistant-${step.id}`;
+            clonedElement.classList.remove('input-error');
+            if (clonedElement.tagName === 'SELECT') {
+                clonedElement.value = originalElement.value;
+            }
+            
+            container.appendChild(clonedElement);
+            this.currentClonedInput = clonedElement;
+            clonedElement.focus();
 
             elements['assistant-prev-btn'].style.display = this.currentStepIndex > 0 ? 'inline-block' : 'none';
             elements['assistant-next-btn'].textContent = this.currentStepIndex === this.steps.length - 1 ? "Terminer" : "Suivant";
         },
 
         nextStep() {
-            const step = this.steps[this.currentStepIndex];
-            const currentElement = elements[step.id];
+            if (!this.currentClonedInput) return;
+            const currentElement = this.currentClonedInput;
 
             if (currentElement.value.trim() === '') {
                 elements['assistant-validation-error'].textContent = "Veuillez entrer une valeur pour continuer.";
@@ -292,6 +332,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             currentElement.classList.remove('input-error');
+            
+            this.updateOriginalInput();
 
             if (this.currentStepIndex === this.steps.length - 1) {
                 this.close();
@@ -303,6 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         skipStep() {
+            this.updateOriginalInput();
             if (this.currentStepIndex < this.steps.length - 1) {
                 this.currentStepIndex++;
                 this.renderStep();
@@ -313,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         prevStep() {
             if (this.currentStepIndex > 0) {
+                this.updateOriginalInput();
                 this.currentStepIndex--;
                 this.renderStep();
             }
