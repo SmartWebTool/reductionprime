@@ -110,11 +110,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!validateInputs()) return;
         clearValidationErrors();
 
-        if (parseInput('revenu-net') < 0) {
+        const revenuNet = parseInput('revenu-net');
+        const fortuneImposable = parseInput('fortune-imposable');
+
+        // --- EXCEPTION & VALIDATION CHECKS ---
+        if (revenuNet < 0) {
             showValidationError("Le revenu net ne peut pas être négatif.");
             elements['revenu-net'].classList.add('input-error');
             return;
         }
+
+        if (revenuNet > 150000) {
+            clearResults();
+            elements['droit-reduction'].textContent = "Non";
+            elements['droit-reduction'].classList.add('negative-value');
+            showValidationError(`Exclusion: Votre revenu net (${formatCurrency(revenuNet)}) dépasse la limite de CHF 150'000.`);
+            return;
+        }
+
+        if (fortuneImposable > 250000) {
+            clearResults();
+            elements['droit-reduction'].textContent = "Non";
+            elements['droit-reduction'].classList.add('negative-value');
+            showValidationError(`Exclusion: Votre fortune imposable (${formatCurrency(fortuneImposable)}) dépasse la limite de CHF 250'000.`);
+            return;
+        }
+        // --- END OF CHECKS ---
 
         const totalDeterminant = calculateDeterminantIncome();
         const situation = {
