@@ -50,7 +50,7 @@
             <div class="calculator">
                 <div class="assistant-banner">
                     <p>Besoin d'aide ? Utilisez notre assistant pour vous guider pas à pas.</p>
-                    <button id="start-assistant-btn">Démarrer l'Assistant</button>
+                    <button id="start-assistant-btn">Démarrer l'assistant</button>
                 </div>
                 <!-- Section Situation Personnelle -->
                 <section class="input-section">
@@ -59,7 +59,7 @@
                         <label for="annee-calcul">Année de calcul</label>
                         <div class="input-wrapper">
                             <input type="text" id="annee-calcul" value="2026" placeholder="Année de calcul" min="2020">
-                            <span class="help-tooltip" data-tooltip="Année pour laquelle la réduction est calculée. Les données de base (primes, etc.) seront chargées pour cette année.">?</span>
+                            <span class="help-tooltip" data-tooltip="Saisissez l'année pour laquelle la réduction sera calculée, exemple: 2026. Les données de base (primes, etc.) seront chargées pour cette année.">?</span>
                         </div>
                     </div>
                     <div class="form-row" data-step-id="statut-civil">
@@ -81,36 +81,36 @@
                                 <option value="1">Région 1 (Sarine)</option>
                                 <option value="2">Région 2 (Autres districts)</option>
                             </select>
-                            <span class="help-tooltip" data-tooltip="La prime moyenne de base pour le calcul varie selon le district du domicile.">?</span>
+                            <span class="help-tooltip" data-tooltip="Sélectionnez votre région. La prime moyenne de base pour le calcul varie selon le district du domicile.">?</span>
                         </div>
                     </div>
                     <div class="form-row" data-step-id="nombre-adultes">
                         <label for="nombre-adultes">Nombre d'adultes (>25 ans)</label>
                         <div class="input-wrapper">
                             <input type="text" id="nombre-adultes" placeholder="Nombre d'adultes" min="0">
-                            <span class="help-tooltip" data-tooltip="Nombre d'adultes parents dans le ménage.">?</span>
+                            <span class="help-tooltip" data-tooltip="Saisissez le nombre d'adultes parents dans le ménage, exemple: 2.">?</span>
                         </div>
                     </div>
                     <div class="form-row" data-step-id="nombre-jeunes">
-                        <label for="nombre-jeunes">Nombre de jeunes adultes (19-25 ans)</label>
+                        <label for="nombre-jeunes">Nombre de jeunes adultes en formation (19-25 ans)</label>
                         <div class="input-wrapper">
-                             <input type="text" id="nombre-jeunes" placeholder="Nombre de jeunes adultes" min="0">
-                            <span class="help-tooltip" data-tooltip="Nombre de jeunes adultes en formation entre 19 et 25 ans.">?</span>
+                             <input type="text" id="nombre-jeunes" placeholder="Nombre de jeunes adultes en formation" min="0">
+                            <span class="help-tooltip" data-tooltip="Saisissez le nombre de jeunes adultes en formation entre 19 et 25 ans, exemple: 0.">?</span>
                         </div>
                     </div>
                     <div class="form-row" data-step-id="nombre-enfants">
                         <label for="nombre-enfants">Nombre d'enfants (0-18 ans)</label>
                         <div class="input-wrapper">
                             <input type="text" id="nombre-enfants" placeholder="Nombre d'enfants" min="0">
-                            <span class="help-tooltip" data-tooltip="Nombre d'enfants jusqu'à 18 ans.">?</span>
+                            <span class="help-tooltip" data-tooltip="Saisissez le nombre d'enfants jusqu'à 18 ans, exemple: 1.">?</span>
                         </div>
                     </div>
                 </section>
 
                 <!-- Section Revenu Déterminant -->
                 <section class="input-section">
-                    <h2><span class="section-number">2</span>Calcul du Revenu Déterminant</h2>
-                    <p class="section-intro">Saisissez les montants de votre taxation fiscale 2024. Pour chaque champ, la valeur utilisée pour le calcul (valeur déterminante) est affichée.</p>
+                    <h2><span class="section-number">2</span>Calcul du revenu déterminant</h2>
+                    <p class="section-intro">Saisissez les montants de votre avis de taxation datant de 2 ans (par exemple avis de taxation 2024 pour demande de réduction 2026). Pour chaque champ, la valeur utilisée pour le calcul (valeur déterminante) sera affichée.</p>
                     
                     <table class="determinant-table">
                         <thead>
@@ -128,19 +128,19 @@
                             <tr data-step-id="revenu-net">
                                 <td>Revenu net</td>
                                 <td>4.910</td>
-                                <td class="input-wrapper"><input type="text" id="revenu-net" placeholder="Avis de taxation (code 4.910)"></td>
+                                <td class="input-wrapper"><input type="text" id="revenu-net" placeholder="Revenu net avis de taxation (code 4.910)"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-revenu-net">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Revenu net selon votre dernière taxation fiscale.">?</span></td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez le revenu net selon votre avis de taxation selon code 4.910, exemple: 40000.">?</span></td>
                             </tr>
                             <!-- Primes caisse-maladie et accidents -->
                             <tr data-step-id="caisse-maladie">
                                 <td>Primes caisse-maladie et accidents</td>
                                 <td>4.110</td>
-                                <td class="input-wrapper"><input type="text" id="caisse-maladie" placeholder="Primes CM / Accidents (code 4.110)"></td>
+                                <td class="input-wrapper"><input type="text" id="caisse-maladie" placeholder="Primes Maladie / Accidents (code 4.110)"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-caisse-maladie">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Montant de vos primes LAMal et LAA.">?</span></td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez le montant de vos primes LAMal et LAA selon code 4.110.">?</span></td>
                             </tr>
                             <!-- Réduction de prime -->
                             <tr data-step-id="reduction-prime">
@@ -149,7 +149,7 @@
                                 <td class="input-wrapper"><input type="text" id="reduction-prime" placeholder="Réduction de prime (code 4.115)"></td>
                                 <td class="operator minus">-</td>
                                 <td class="determinant-value" id="determinant-reduction-prime">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Montant de la réduction de prime déjà reçue ou attendue. Ce montant est déduit du revenu déterminant.">?</span></td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez le montant de la réduction de prime déjà reçue ou attendue selon code 4.115, exemple: 0 si aucune réduction n'a été reçue. Ce montant sera déduit du revenu déterminant.">?</span></td>
                             </tr>
                             <!-- Autres primes et cotisations (pilier 3b) -->
                             <tr data-step-id="autres-primes">
@@ -158,25 +158,25 @@
                                 <td class="input-wrapper"><input type="text" id="autres-primes" placeholder="Autres primes (code 4.120)"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-autres-primes">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Primes d'assurances vie et rentes (pilier 3b).">?</span></td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les primes d'assurances vie et rentes (pilier 3b) selon code 4.120, exemple: 0 si aucune prime n'est payée.">?</span></td>
                             </tr>
                             <!-- Prévoyance liée (pilier 3a) conjoint -->
                             <tr data-step-id="prevoyance-conjoint">
                                 <td>Prévoyance liée (3a) conjoint</td>
                                 <td>4.130</td>
-                                <td class="input-wrapper"><input type="text" id="prevoyance-conjoint" placeholder="Prév. liée conjoint (code 4.130)"></td>
+                                <td class="input-wrapper"><input type="text" id="prevoyance-conjoint" placeholder="Prévoyance liée conjoint (code 4.130)"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-prevoyance-conjoint">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Cotisations au 3ème pilier A pour le premier conjoint.">?</span></td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les cotisations au 3ème pilier A pour le premier conjoint selon code 4.130.">?</span></td>
                             </tr>
                             <!-- Prévoyance liée (pilier 3a) conjointe -->
                             <tr data-step-id="prevoyance-conjointe">
                                 <td>Prévoyance liée (3a) conjointe</td>
                                 <td>4.130</td>
-                                <td class="input-wrapper"><input type="text" id="prevoyance-conjointe" placeholder="Prév. liée conjointe (code 4.130)"></td>
+                                <td class="input-wrapper"><input type="text" id="prevoyance-conjointe" placeholder="Prévoyance liée conjointe (code 4.130)"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-prevoyance-conjointe">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Cotisations au 3ème pilier A pour la seconde conjointe.">?</span></td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les cotisations au 3ème pilier A pour la conjointe selon code 4.130, exemple: 0 si aucune cotisation n'est payée.">?</span></td>
                             </tr>
                             <!-- Rachat d'années d'assurance (2ème pilier) -->
                             <tr data-step-id="rachat-assurance">
@@ -185,7 +185,7 @@
                                 <td class="input-wrapper"><input type="text" id="rachat-assurance" placeholder="Rachat 2e pilier (code 4.140)"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-rachat-assurance">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Rachats d'années LPP. La part excédant 15'000 CHF est ajoutée.">?</span></td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les rachats d'années LPP selon code 4.140, exemple: 0 si aucun rachat n'a été effectué. Seule la part excédant 15'000 CHF sera ajoutée.">?</span></td>
                             </tr>
                             <!-- Intérêts passifs privés -->
                             <tr data-step-id="interets-passifs">
@@ -194,7 +194,7 @@
                                 <td class="input-wrapper"><input type="text" id="interets-passifs" placeholder="Intérêts passifs (code 4.210)"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-interets-passifs">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Seule la part des intérêts qui dépasse 30'000 CHF est ajoutée.">?</span></td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les intérêts passifs selon code 4.210, exemple: 1750. Seule la part des intérêts qui dépasse 30'000 CHF sera ajoutée.">?</span></td>
                             </tr>
                             <!-- Frais d'entretien d'immeubles privés -->
                             <tr data-step-id="frais-immeubles">
@@ -203,7 +203,7 @@
                                 <td class="input-wrapper"><input type="text" id="frais-immeubles" placeholder="Frais immeubles (code 4.310)"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-frais-immeubles">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Seule la part des frais qui dépasse 15'000 CHF est ajoutée.">?</span></td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les frais d'entretien des immeubles selon code 4.310, exemple: 3450. Seule la part des frais qui dépasse 15'000 CHF sera ajoutée.">?</span></td>
                             </tr>
                             <!-- Fortune imposable -->
                             <tr data-step-id="fortune-imposable">
@@ -212,7 +212,7 @@
                                 <td class="input-wrapper"><input type="text" id="fortune-imposable" placeholder="Fortune imposable (code 7.910)"></td>
                                 <td class="operator plus">+</td>
                                 <td class="determinant-value" id="determinant-fortune-imposable">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="1/20ème de la fortune est ajouté. Une fortune négative est comptée comme 0.">?</span></td>
+                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez la fortune imposable selon code 7.910, exemple: 25000 en cas de fortune ou -35000 en cas de dette. Seul 1/20ème de la fortune > 0 CHF sera ajouté. Une fortune négative est comptée comme 0.">?</span></td>
                             </tr>
                         </tbody>
                         <tfoot>

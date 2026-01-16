@@ -35,3 +35,37 @@ Instructions for gemini:
 4. Propose improvements to the assistant : user friendliness, ease of implementation in vanilla javascript (avoid libraries)
 5. Wait for implementation acceptance
 6. Implement solution
+
+------------------
+gemini,
+I changed my mind regarding the input fields value= "0" versus placeholder="0" for the questions of sections 1 and 2. The advantage of value="0" is that there is nor error signaled when the user hits RETURN without entering a value, but for instance a Revenu of 0 CHF is highly improbable and would result in calculation with wrong values. It is much better to force the user to enter a value also when this value is 0. At least, this entering is done with full knowledge rather than in inadvertance. Thus, my new requirements:
+1. For all the fields of section 1 and 2, the fields are empty (empty string or empty selection for combobox)
+2. The placeholders are used to display an instruction, ie "Saisir la valeur de l'avis de taxation code 4.910" for section 2 or for section 1 "Saisir l'année de calcul, par exemple: 2026", etc.
+3. The script checks for plausability and warn user by errors, ie negative Revenu, etc.
+4. When the user click "Calculer", the script checks if all the fields have been filled up. If not, he sends a warning "Veuillez remplir les champs marqués en rouge", then change the color of the placeholders in red for the empty fields / not selected fields
+5. When all the fields are fillfulled (not empty), the section 3 is displayed with the results.
+
+Security requirements:
+1. No values are locally stored by default (for confidentiality reasons)
+2. The values are stored only when the user click the button "Sauvegarder localement" ( the user decides to store value with full consciounnes)
+3. By launching or by refreshing the calculator, a banner signals that values were locally stored and asks the user if he want to use these values. By positive answer, the recorded values are written in the corresponding fields. By negative answer, the local stored values are deleted.
+4. The button "Charger les données" is no longer necessary because the question is asked by the banner at each start or refresh
+
+Assistant requirements:
+1. The assistant goes systematically by each question (value field empty or filled with restored values or filled by a previous assistant action)
+2. When all the fields are filled up, it confirms that the filling up is complete and that the user should now click on "Calculer" to calculate the orime reduction.
+
+Section 3 requirements:
+1. As long as thdpe calculate button is not pressed, the section 3 has empty values, not values from previous calculations
+2. When the user change any value in assisted or direct mode, the section 3 values are deleted (empty results), making sure that the results from previous values is not understood as current result with displayed values (values are changed, but the sectiin 3 displays results from previous values)
+
+Help requirements:
+1. The help icons are displayed only for the direct mode
+2. In assistant mode, the help icons are not recessary because the help text is allready displayed
+3. The Help icons are active in the direct mode. As soon the user quits the assistant, the help icons are activated and display help text by clicking on them.
+
+Instructions for gemini:
+1. Ask for precisions when solution miss some points or is difficult to implement
+2. Propose improvements : user friendliness, ease of implementation in vanilla javascript (avoid libraries)
+3. Wait for implementation acceptance
+4. Implement solution
