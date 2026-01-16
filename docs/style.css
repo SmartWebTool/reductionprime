@@ -642,11 +642,16 @@ select {
     .container {
         width: 100%; max-width: 100%; margin: 0; padding: 0; box-shadow: none; border-radius: 0;
     }
-    header p, .section-number, .help-tooltip, .calculate-button-container, .storage-button-container, .section-intro, .disclaimer, .operator, .assistant-banner, .toast, .modal-overlay {
+    header {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+    header p, .section-number, .help-tooltip, .calculate-button-container, .storage-button-container, .section-intro, .disclaimer, .operator, .unified-banner, .toast, .modal-overlay {
         display: none !important;
     }
     header h1 {
-        font-size: 18pt; text-align: center; margin-bottom: 15px;
+        font-size: 18pt; text-align: center; margin-bottom: 5px;
     }
     h2 {
         font-size: 14pt; border-bottom: none; padding-bottom: 0; margin-top: 15px; margin-bottom: 5px;
@@ -669,7 +674,7 @@ select {
         display: table !important; width: 100% !important; border-collapse: collapse !important; margin-top: 5px;
     }
     .determinant-table thead, .reduction-breakdown-table thead { display: table-header-group !important; }
-    .determinant-table tbody, .reduction-breakdown-table tbody, .determinant-table tfoot, .reduction-reduction-breakdown-table tfoot { display: table-row-group !important; }
+    .determinant-table tbody, .reduction-breakdown-table tbody, .determinant-table tfoot, .reduction-breakdown-table tfoot { display: table-row-group !important; }
     .determinant-table tr, .reduction-breakdown-table tr { display: table-row !important; page-break-inside: avoid; border: none !important; }
     .determinant-table th, .determinant-table td, .reduction-breakdown-table th, .reduction-breakdown-table td {
         display: table-cell !important; width: auto !important; border: 1px solid #ccc !important; padding: 2px 6px !important; font-size: 9pt !important; vertical-align: middle !important; text-align: left !important; background: transparent !important; justify-content: initial !important; align-items: initial !important;
