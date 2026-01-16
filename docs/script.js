@@ -24,28 +24,21 @@ document.addEventListener('DOMContentLoaded', () => {
         'taux-reduction-applicable', 'droit-reduction', 'breakdown-body', 'breakdown-foot',
         'calculate-btn', 'print-btn', 'save-btn', 'toast-notification', 'toast-load-yes', 'toast-load-no',
         'start-assistant-btn', 'assistant-modal', 'assistant-title', 'assistant-help-text', 'assistant-input-container',
-        'assistant-validation-error', 'assistant-prev-btn', 'assistant-next-btn', 'close-assistant-btn'
+        'assistant-validation-error', 'assistant-prev-btn', 'assistant-next-btn', 'assistant-skip-btn', 'close-assistant-btn'
     ];
     allElementIds.forEach(id => {
         const el = document.getElementById(id);
-        if (el) {
-            elements[id] = el;
-        } else {
-            console.warn(`Element with ID '${id}' not found.`);
-        }
+        if (el) elements[id] = el;
     });
-
+    
     const validationBanner = document.createElement('div');
     validationBanner.id = 'validation-error-banner';
     validationBanner.className = 'validation-error';
     validationBanner.style.display = 'none';
     const firstSectionH2 = document.querySelector('.input-section > h2');
-    if (firstSectionH2) {
-        firstSectionH2.after(validationBanner);
-    }
+    if (firstSectionH2) firstSectionH2.after(validationBanner);
     elements.validationErrorBanner = validationBanner;
-
-
+    
     // --- CORE UI & VALIDATION ---
     const clearResults = () => {
         ['limite-revenu', 'revenu-determinant-calcule', 'diff-valeur', 'diff-percent', 'taux-reduction-applicable', 'droit-reduction'].forEach(id => {
@@ -54,8 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 elements[id].classList.remove('negative-value');
             }
         });
-        if (elements.breakdownBody) elements.breakdownBody.innerHTML = '';
-        if (elements.breakdownFoot) elements.breakdownFoot.innerHTML = '';
+        if (elements['breakdown-body']) elements['breakdown-body'].innerHTML = '';
+        if (elements['breakdown-foot']) elements['breakdown-foot'].innerHTML = '';
     };
 
     const clearValidationErrors = () => {
@@ -81,8 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return true;
     };
-
-
+    
     // --- DATA & CALCULATION ---
     const parseInput = id => {
         const value = String(elements[id]?.value || '0').replace(/['\s]/g, '');
@@ -93,12 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const calculateDeterminantIncome = () => {
         const determinants = {
-            revenuNet: parseInput('revenu-net'),
-            caisseMaladie: parseInput('caisse-maladie'),
-            reductionPrime: -parseInput('reduction-prime'),
-            autresPrimes: parseInput('autres-primes'),
-            prevoyanceConjoint: parseInput('prevoyance-conjoint'),
-            prevoyanceConjointe: parseInput('prevoyance-conjointe'),
+            revenuNet: parseInput('revenu-net'), caisseMaladie: parseInput('caisse-maladie'),
+            reductionPrime: -parseInput('reduction-prime'), autresPrimes: parseInput('autres-primes'),
+            prevoyanceConjoint: parseInput('prevoyance-conjoint'), prevoyanceConjointe: parseInput('prevoyance-conjointe'),
             rachatAssurance: Math.max(0, parseInput('rachat-assurance') - (csvData.config.franchise_rachat_lpp || 0)),
             interetsPassifs: Math.max(0, parseInput('interets-passifs') - (csvData.config.franchise_interets_passifs || 0)),
             fraisImmeubles: Math.max(0, parseInput('frais-immeubles') - (csvData.config.franchise_frais_immeubles || 0)),
@@ -111,12 +100,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const total = Object.values(determinants).reduce((sum, val) => sum + val, 0);
-        if (elements.totalDeterminantSum) elements.totalDeterminantSum.textContent = formatCurrency(total);
+        if (elements['total-determinant-sum']) elements['total-determinant-sum'].textContent = formatCurrency(total);
         return total;
     };
     
     const calculateAndDisplayResults = () => {
         if (!validateInputs()) return;
+        clearValidationErrors();
+
         if (parseInput('revenu-net') < 0) {
             showValidationError("Le revenu net ne peut pas être négatif.");
             elements['revenu-net'].classList.add('input-error');
@@ -130,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             adultes: parseInput('nombre-adultes'),
             jeunes: parseInput('nombre-jeunes'),
             enfantsNb: parseInput('nombre-enfants'),
-            region: parseInt(elements.region.value, 10)
+            region: parseInt(elements['region'].value, 10)
         };
 
         const limitEntry = csvData.incomeLimits.find(l => l.situation === situation.statut && l.children === situation.enfants);
@@ -143,25 +134,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const diffValeur = incomeLimit - totalDeterminant;
         const diffPercent = incomeLimit > 0 ? (diffValeur / incomeLimit) * 100 : 0;
 
-        elements.limiteRevenu.textContent = formatCurrency(incomeLimit);
-        elements.revenuDeterminantCalcule.textContent = formatCurrency(totalDeterminant);
-        elements.diffValeur.textContent = formatCurrency(diffValeur);
-        elements.diffPercent.textContent = `${diffPercent.toFixed(2)} %`;
-        elements.diffValeur.classList.toggle('negative-value', diffValeur < 0);
-        elements.diffPercent.classList.toggle('negative-value', diffValeur < 0);
+        elements['limite-revenu'].textContent = formatCurrency(incomeLimit);
+        elements['revenu-determinant-calcule'].textContent = formatCurrency(totalDeterminant);
+        elements['diff-valeur'].textContent = formatCurrency(diffValeur);
+        elements['diff-percent'].textContent = `${diffPercent.toFixed(2)} %`;
+        elements['diff-valeur'].classList.toggle('negative-value', diffValeur < 0);
+        elements['diff-percent'].classList.toggle('negative-value', diffValeur < 0);
 
         if (diffValeur < 0) {
-            elements.droitReduction.textContent = "Non";
-            elements.tauxReductionApplicable.textContent = 'Non applicable';
-            elements.breakdownBody.innerHTML = '';
-            elements.breakdownFoot.innerHTML = '';
+            elements['droit-reduction'].textContent = "Non";
+            elements['taux-reduction-applicable'].textContent = 'Non applicable';
+            elements['breakdown-body'].innerHTML = '';
+            elements['breakdown-foot'].innerHTML = '';
             return;
         }
 
-        elements.droitReduction.textContent = "Oui";
+        elements['droit-reduction'].textContent = "Oui";
         const rateEntry = csvData.rateGrid.find(r => diffPercent >= r.revenu_min_percent && diffPercent <= r.revenu_max_percent);
         const reductionRatePercent = rateEntry ? rateEntry.taux_applique_prime_moyenne_percent : 0;
-        elements.tauxReductionApplicable.textContent = `${reductionRatePercent.toFixed(2)} %`;
+        elements['taux-reduction-applicable'].textContent = `${reductionRatePercent.toFixed(2)} %`;
 
         const { config } = csvData;
         const premiums = {
@@ -187,10 +178,9 @@ document.addEventListener('DOMContentLoaded', () => {
             breakdownHTML += `<tr><td>Enfants (0-18 ans)</td><td>${formatCurrency(premiums.child)}</td><td>${(config.taux_reduction_enfant || 0).toFixed(2)} %</td><td>${formatCurrency(reduction)}</td></tr>`;
             totalAnnualReduction += reduction;
         }
-        elements.breakdownBody.innerHTML = breakdownHTML;
-        elements.breakdownFoot.innerHTML = `<tr><td colspan="3">Total Réductions</td><td>${formatCurrency(totalAnnualReduction)}</td></tr>`;
+        elements['breakdown-body'].innerHTML = breakdownHTML;
+        elements['breakdown-foot'].innerHTML = `<tr><td colspan="3">Total Réductions</td><td>${formatCurrency(totalAnnualReduction)}</td></tr>`;
     };
-
 
     // --- DATA LOADING & STORAGE ---
     const loadDataForYear = async (year) => {
@@ -236,12 +226,10 @@ document.addEventListener('DOMContentLoaded', () => {
         elements['toast-load-no'].addEventListener('click', () => { localStorage.removeItem(LOCAL_STORAGE_KEY); elements['toast-notification'].style.display = 'none'; }, { once: true });
     };
 
-
     // --- ASSISTANT LOGIC (REFACTORED & ROBUST) ---
     const assistant = {
         steps: [],
         currentStepIndex: 0,
-        clone: null,
         
         init() {
             this.steps = formInputIds.map(id => {
@@ -253,127 +241,128 @@ document.addEventListener('DOMContentLoaded', () => {
                     title: container?.querySelector('label, td:first-child')?.textContent.trim() || id,
                     help: container?.querySelector('.help-tooltip')?.dataset.tooltip || "Veuillez saisir la valeur pour ce champ."
                 };
-            }).filter(Boolean); // Filter out null steps if element not found
+            }).filter(Boolean);
 
-            if (elements.startAssistantBtn) elements.startAssistantBtn.addEventListener('click', () => this.start());
-            if (elements.closeAssistantBtn) elements.closeAssistantBtn.addEventListener('click', () => this.close());
-            if (elements.assistantPrevBtn) elements.assistantPrevBtn.addEventListener('click', () => this.prevStep());
-            if (elements.assistantNextBtn) elements.assistantNextBtn.addEventListener('click', () => this.nextStep());
+            if (elements['start-assistant-btn']) elements['start-assistant-btn'].addEventListener('click', () => this.start());
+            if (elements['close-assistant-btn']) elements['close-assistant-btn'].addEventListener('click', () => this.close());
+            if (elements['assistant-prev-btn']) elements['assistant-prev-btn'].addEventListener('click', () => this.prevStep());
+            if (elements['assistant-next-btn']) elements['assistant-next-btn'].addEventListener('click', () => this.nextStep());
+            if (elements['assistant-skip-btn']) elements['assistant-skip-btn'].addEventListener('click', () => this.skipStep());
         },
 
         start() {
-            if (this.steps.length === 0) return;
+            if (this.steps.length === 0 || !elements['assistant-modal']) return;
             this.currentStepIndex = 0;
-            document.body.classList.add('assistant-active');
-            elements.assistantNextBtn.disabled = false;
-            elements.assistantPrevBtn.disabled = false;
-            elements.assistantModal.style.display = 'flex';
+            elements['assistant-next-btn'].disabled = false;
+            elements['assistant-prev-btn'].disabled = false;
+            elements['assistant-modal'].style.display = 'flex';
             this.renderStep();
         },
 
         close() {
-            if (this.clone) {
-                const lastStepId = this.steps[this.currentStepIndex].id;
-                elements[lastStepId].value = this.clone.value;
-            }
-            document.body.classList.remove('assistant-active');
-            elements.assistantModal.style.display = 'none';
-            if (elements.assistantInputContainer) elements.assistantInputContainer.innerHTML = '';
-            calculateDeterminantIncome();
+            if (elements['assistant-modal']) elements['assistant-modal'].style.display = 'none';
         },
         
         renderStep() {
             const step = this.steps[this.currentStepIndex];
             const originalElement = elements[step.id];
+            
+            elements['assistant-title'].textContent = `${step.title} (${this.currentStepIndex + 1}/${this.steps.length})`;
+            elements['assistant-help-text'].textContent = step.help;
+            elements['assistant-validation-error'].style.display = 'none';
+            
+            // Simple focus method
+            originalElement.focus();
+            originalElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-            this.clone = originalElement.cloneNode(true);
-            this.clone.addEventListener('input', () => {
-                if (elements.assistantValidationError) elements.assistantValidationError.style.display = 'none';
-            });
+            elements['assistant-input-container'].innerHTML = `<p><i>Le champ de saisie est mis en évidence sur la page principale.</i></p>`;
 
-            elements.assistantTitle.textContent = `${step.title} (${this.currentStepIndex + 1}/${this.steps.length})`;
-            elements.assistantHelpText.textContent = step.help;
-            elements.assistantValidationError.style.display = 'none';
-            elements.assistantInputContainer.innerHTML = '';
-            elements.assistantInputContainer.appendChild(this.clone);
-            this.clone.focus();
-
-            elements.assistantPrevBtn.style.display = this.currentStepIndex > 0 ? 'inline-block' : 'none';
-            elements.assistantNextBtn.textContent = this.currentStepIndex === this.steps.length - 1 ? "Terminer" : "Suivant";
+            elements['assistant-prev-btn'].style.display = this.currentStepIndex > 0 ? 'inline-block' : 'none';
+            elements['assistant-next-btn'].textContent = this.currentStepIndex === this.steps.length - 1 ? "Terminer" : "Suivant";
         },
 
         nextStep() {
-            if (this.clone.value.trim() === '') {
-                elements.assistantValidationError.textContent = "Veuillez entrer une valeur pour continuer.";
-                elements.assistantValidationError.style.display = 'block';
+            const step = this.steps[this.currentStepIndex];
+            const currentElement = elements[step.id];
+
+            if (currentElement.value.trim() === '') {
+                elements['assistant-validation-error'].textContent = "Veuillez entrer une valeur pour continuer.";
+                elements['assistant-validation-error'].style.display = 'block';
+                currentElement.classList.add('input-error');
                 return;
             }
-            elements[this.steps[this.currentStepIndex].id].value = this.clone.value;
+            currentElement.classList.remove('input-error');
 
             if (this.currentStepIndex === this.steps.length - 1) {
-                elements.assistantHelpText.textContent = "La saisie est maintenant terminée. Vous pouvez fermer cette fenêtre et cliquer sur 'Calculer' pour obtenir votre estimation.";
-                elements.assistantInputContainer.innerHTML = '';
-                elements.assistantNextBtn.disabled = true;
+                this.close();
+                alert("La saisie est maintenant terminée. Vous pouvez cliquer sur 'Calculer' pour obtenir votre estimation.");
             } else {
                 this.currentStepIndex++;
                 this.renderStep();
             }
         },
 
+        skipStep() {
+            if (this.currentStepIndex < this.steps.length - 1) {
+                this.currentStepIndex++;
+                this.renderStep();
+            } else {
+                this.close();
+            }
+        },
+
         prevStep() {
             if (this.currentStepIndex > 0) {
-                elements[this.steps[this.currentStepIndex].id].value = this.clone.value;
                 this.currentStepIndex--;
                 this.renderStep();
             }
         }
     };
 
-
     // --- INITIALIZATION ---
     const init = async () => {
-        // Ensure all critical elements exist before adding listeners
-        if (elements.calculateBtn) elements.calculateBtn.addEventListener('click', calculateAndDisplayResults);
-        if (elements.saveBtn) elements.saveBtn.addEventListener('click', saveData);
-        if (elements.printBtn) elements.printBtn.addEventListener('click', () => window.print());
-        
-        const container = document.querySelector('.container');
-        if (container) {
-            container.addEventListener('input', e => {
-                if (areListenersActive && e.target.id !== 'annee-calcul') {
-                    if (document.body.classList.contains('assistant-active')) return;
+        try {
+            if (elements['calculate-btn']) elements['calculate-btn'].addEventListener('click', calculateAndDisplayResults);
+            if (elements['save-btn']) elements['save-btn'].addEventListener('click', saveData);
+            if (elements['print-btn']) elements['print-btn'].addEventListener('click', () => window.print());
+            
+            const container = document.querySelector('.container');
+            if (container) {
+                container.addEventListener('input', e => {
+                    if (areListenersActive && e.target.id !== 'annee-calcul') {
+                        clearResults();
+                        calculateDeterminantIncome();
+                        if (e.target.classList.contains('input-error')) {
+                            e.target.classList.remove('input-error');
+                        }
+                    }
+                });
+            }
+            
+            if (elements['annee-calcul']) {
+                elements['annee-calcul'].addEventListener('change', async () => {
+                    clearValidationErrors();
+                    const year = elements['annee-calcul'].value;
+                    if (!await loadDataForYear(year)) {
+                        alert(`Données non trouvées pour l'année ${year}. Retour à ${DEFAULT_YEAR}.`);
+                        elements['annee-calcul'].value = DEFAULT_YEAR;
+                        await loadDataForYear(DEFAULT_YEAR);
+                    }
                     clearResults();
                     calculateDeterminantIncome();
-                    if (e.target.classList.contains('input-error')) {
-                        e.target.classList.remove('input-error');
-                    }
-                }
-            });
-        }
-        
-        if (elements['annee-calcul']) {
-            elements['annee-calcul'].addEventListener('change', async () => {
-                clearValidationErrors();
-                const year = elements['annee-calcul'].value;
-                if (!await loadDataForYear(year)) {
-                    alert(`Données non trouvées pour l'année ${year}. Retour à ${DEFAULT_YEAR}.`);
-                    elements['annee-calcul'].value = DEFAULT_YEAR;
-                    await loadDataForYear(DEFAULT_YEAR);
-                }
-                clearResults();
-                calculateDeterminantIncome();
-            });
-        }
+                });
+            }
 
-        assistant.init();
-        handleStorageBanner();
-        await loadDataForYear(DEFAULT_YEAR);
-        clearResults();
-        calculateDeterminantIncome();
+            assistant.init();
+            handleStorageBanner();
+            await loadDataForYear(DEFAULT_YEAR);
+            clearResults();
+            calculateDeterminantIncome();
+        } catch (error) {
+            console.error("An error occurred during initialization:", error);
+            alert("Une erreur critique est survenue lors du chargement de l'application. Veuillez rafraîchir la page.");
+        }
     };
 
-    init().catch(error => {
-        console.error("An error occurred during initialization:", error);
-        alert("Une erreur critique est survenue lors du chargement de l'application. Veuillez rafraîchir la page.");
-    });
+    init();
 });
