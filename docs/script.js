@@ -279,9 +279,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 step.status = (element && element.value.trim() !== '') ? 'answered' : 'pending';
             });
 
-            // Find the first step that is not 'answered'
-            let firstUnansweredIndex = this.steps.findIndex(step => step.status !== 'answered');
-            this.currentStepIndex = (firstUnansweredIndex !== -1) ? firstUnansweredIndex : 0;
+            // Always start from the first question for review
+            this.currentStepIndex = 0;
 
             this.currentClonedInput = null;
             elements['assistant-modal'].style.display = 'flex';
@@ -318,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     dot.classList.add('current');
                 }
                 dot.addEventListener('click', () => {
-                    this.updateOriginalInput();
+                    this.updateOriginalInput(); // Save current work before jumping
                     this.currentStepIndex = index;
                     this.renderStep();
                 });
@@ -351,26 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
             clonedElement.focus();
 
             elements['assistant-prev-btn'].style.display = this.currentStepIndex > 0 ? 'inline-block' : 'none';
-            elements['assistant-next-btn'].textContent = this.findNextStep(true) === -1 ? "Terminer" : "Suivant";
-        },
-
-        findNextStep(loop = true) {
-            // Search from current position to the end
-            for (let i = this.currentStepIndex + 1; i < this.steps.length; i++) {
-                if (this.steps[i].status !== 'answered') {
-                    return i;
-                }
-            }
-            // If loop is true, search from the beginning to the current position
-            if (loop) {
-                for (let i = 0; i < this.currentStepIndex; i++) {
-                    if (this.steps[i].status !== 'answered') {
-                        return i;
-                    }
-                }
-            }
-            // If no steps found
-            return -1;
+            elements['assistant-next-btn'].textContent = this.currentStepIndex === this.steps.length - 1 ? "Terminer" : "Suivant";
         },
 
         nextStep() {
@@ -388,10 +368,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.steps[this.currentStepIndex].status = 'answered';
             this.updateOriginalInput();
 
-            const nextIndex = this.findNextStep();
-
-            if (nextIndex !== -1) {
-                this.currentStepIndex = nextIndex;
+            if (this.currentStepIndex < this.steps.length - 1) {
+                this.currentStepIndex++;
                 this.renderStep();
             } else {
                 this.close();
@@ -400,25 +378,24 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         skipStep() {
-            const currentStep = this.steps[this.currentStepIndex];
-            if (currentStep.status !== 'answered') {
-                currentStep.status = 'skipped';
-            }
+            this.updateOriginalInput(); // Save any partial input
             
-            this.updateOriginalInput();
-            const nextIndex = this.findNextStep();
+            // Update status based on whether there's a value
+            const currentStep = this.steps[this.currentStepIndex];
+            const originalElement = elements[currentStep.id];
+            if (originalElement.value.trim() === '') {
+                if (currentStep.status !== 'answered') {
+                     currentStep.status = 'skipped';
+                }
+            } else {
+                currentStep.status = 'answered';
+            }
 
-            if (nextIndex !== -1) {
-                this.currentStepIndex = nextIndex;
+            if (this.currentStepIndex < this.steps.length - 1) {
+                this.currentStepIndex++;
                 this.renderStep();
             } else {
-                 const firstSkipped = this.steps.findIndex(s => s.status === 'skipped');
-                 if (firstSkipped !== -1) {
-                    this.currentStepIndex = firstSkipped;
-                    this.renderStep();
-                 } else {
-                    this.close();
-                 }
+                this.close(); // At the end, skip behaves like finish
             }
         },
 
