@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'calculate-btn', 'print-btn', 'save-btn', 'toast-notification', 'toast-load-yes', 'toast-load-no',
         'start-assistant-btn', 'assistant-modal', 'assistant-title', 'assistant-help-text', 'assistant-input-container',
         'assistant-validation-error', 'assistant-prev-btn', 'assistant-next-btn', 'assistant-skip-btn', 'close-assistant-btn',
-        'assistant-progress-bar'
+        'assistant-progress-bar',
+        'show-help-btn', 'help-modal', 'close-help-btn', 'help-modal-body'
     ];
     allElementIds.forEach(id => {
         const el = document.getElementById(id);
@@ -225,6 +226,102 @@ document.addEventListener('DOMContentLoaded', () => {
         elements['toast-notification'].style.display = 'flex';
         elements['toast-load-yes'].addEventListener('click', () => { loadData(); elements['toast-notification'].style.display = 'none'; }, { once: true });
         elements['toast-load-no'].addEventListener('click', () => { localStorage.removeItem(LOCAL_STORAGE_KEY); elements['toast-notification'].style.display = 'none'; }, { once: true });
+    };
+
+        // --- HELP MODAL LOGIC ---
+    const helpModal = {
+        readmeContent: null, // Cache for the fetched content
+        
+        init() {
+            if (elements['show-help-btn']) {
+                elements['show-help-btn'].addEventListener('click', () => this.show());
+            }
+            if (elements['close-help-btn']) {
+                elements['close-help-btn'].addEventListener('click', () => this.hide());
+            }
+        },
+
+        show() {
+            elements['help-modal'].style.display = 'flex';
+            if (this.readmeContent) {
+                elements['help-modal-body'].innerHTML = this.readmeContent;
+            } else {
+                this.fetchAndRenderReadme();
+            }
+        },
+
+        hide() {
+            elements['help-modal'].style.display = 'none';
+        },
+
+        parseMarkdown(markdown) {
+            // A very simple parser
+            let html = markdown
+                .split('\n')
+                .map(line => {
+                    // Links (simple inline) must be first to avoid conflicts with other patterns
+                    line = line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+                    // Images (simple inline)
+                    line = line.replace(/!\[([^\]]+)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto;">');
+
+                    // Headings
+                    if (line.startsWith('### ')) return `<h3>${line.substring(4)}</h3>`;
+                    if (line.startsWith('## ')) return `<h2>${line.substring(3)}</h2>`;
+                    if (line.startsWith('# ')) return `<h1>${line.substring(2)}</h1>`;
+                    
+                    // Lists
+                    if (line.startsWith('* ') || line.startsWith('- ')) return `<li>${line.substring(2)}</li>`;
+                    
+                    return `<p>${line}</p>`;
+                })
+                .join('');
+            
+            // Post-process to group list items
+            html = html.replace(/<\/p><li>/g, '<li>'); // Fix for p tags around li
+            html = html.replace(/<li><p>/g, '<li>'); // Fix for p tags around li
+
+            // Convert consecutive <li> into <ul>
+            html = html.replace(/(<li>.*?<\/li>)\s*(<li>.*?<\/li>)+/gs, (match, p1, p2) => {
+                let listItems = [p1];
+                let rest = p2;
+                while (rest.startsWith('<li>')) {
+                    const nextLiMatch = rest.match(/(<li>.*?<\/li>)/);
+                    if (nextLiMatch) {
+                        listItems.push(nextLiMatch[0]);
+                        rest = rest.substring(nextLiMatch[0].length).trim();
+                    } else {
+                        break;
+                    }
+                }
+                return `<ul>${listItems.join('')}</ul>` + rest;
+            });
+
+            // Handle lone <li>
+            html = html.replace(/<li>(.*?)<\/li>/g, '<ul><li>$1</li></ul>');
+
+            // Remove empty paragraphs
+            html = html.replace(/<p><\/p>/g, '');
+            // Convert multiple newlines to single paragraph breaks
+            html = html.replace(/\n\s*\n/g, '</p><p>');
+
+            return html;
+        },
+
+        async fetchAndRenderReadme() {
+            const url = 'https://raw.githubusercontent.com/SmartWebTool/reductionprime/main/README.md';
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const markdown = await response.text();
+                this.readmeContent = this.parseMarkdown(markdown);
+                elements['help-modal-body'].innerHTML = this.readmeContent;
+            } catch (error) {
+                console.error("Error fetching README:", error);
+                elements['help-modal-body'].innerHTML = '<p>Impossible de charger le contenu de l\'aide. Veuillez réessayer plus tard.</p>';
+            }
+        }
     };
 
     // --- ASSISTANT LOGIC (REFACTORED & ROBUST) ---
@@ -442,6 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
+            helpModal.init();
             assistant.init();
             handleStorageBanner();
             await loadDataForYear(DEFAULT_YEAR);

@@ -653,7 +653,7 @@ select {
         display: table !important; width: 100% !important; border-collapse: collapse !important; margin-top: 5px;
     }
     .determinant-table thead, .reduction-breakdown-table thead { display: table-header-group !important; }
-    .determinant-table tbody, .reduction-breakdown-table tbody, .determinant-table tfoot, .reduction-breakdown-table tfoot { display: table-row-group !important; }
+    .determinant-table tbody, .reduction-breakdown-table tbody, .determinant-table tfoot, .reduction-reduction-breakdown-table tfoot { display: table-row-group !important; }
     .determinant-table tr, .reduction-breakdown-table tr { display: table-row !important; page-break-inside: avoid; border: none !important; }
     .determinant-table th, .determinant-table td, .reduction-breakdown-table th, .reduction-breakdown-table td {
         display: table-cell !important; width: auto !important; border: 1px solid #ccc !important; padding: 2px 6px !important; font-size: 9pt !important; vertical-align: middle !important; text-align: left !important; background: transparent !important; justify-content: initial !important; align-items: initial !important;
@@ -686,4 +686,67 @@ select {
 
 body.assistant-active .help-tooltip {
     display: none;
+}
+
+/* Help Button in Header */
+.help-button {
+    background-color: #e7f3ff;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    transition: all 0.3s;
+}
+.help-button:hover {
+    background-color: #d0e7ff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.help-button-icon {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+/* Help Modal specific styles */
+.modal-content-help {
+    width: 90%;
+    max-width: 800px; /* Wider for better text readability */
+    height: 80vh; /* Taller to show more content */
+}
+
+#help-modal-body {
+    overflow-y: auto; /* Allow scrolling */
+    padding-right: 15px; /* Space for scrollbar */
+}
+
+/* Simple styles for rendered markdown */
+#help-modal-body h1, #help-modal-body h2, #help-modal-body h3 {
+    color: var(--primary-color);
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-top: 20px;
+}
+#help-modal-body a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+#help-modal-body a:hover {
+    text-decoration: underline;
+}
+#help-modal-body ul {
+    padding-left: 20px;
+}
+#help-modal-body li {
+    margin-bottom: 8px;
+}
+#help-modal-body code {
+    background-color: #f4f4f4;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-family: monospace;
 }
