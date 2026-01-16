@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
         'taux-reduction-applicable', 'droit-reduction', 'breakdown-body', 'breakdown-foot',
         'calculate-btn', 'print-btn', 'save-btn', 'toast-notification', 'toast-load-yes', 'toast-load-no',
         'start-assistant-btn', 'assistant-modal', 'assistant-title', 'assistant-help-text', 'assistant-input-container',
-        'assistant-validation-error', 'assistant-prev-btn', 'assistant-next-btn', 'assistant-skip-btn', 'close-assistant-btn'
+        'assistant-validation-error', 'assistant-prev-btn', 'assistant-next-btn', 'assistant-skip-btn', 'close-assistant-btn',
+        'assistant-progress-bar'
     ];
     allElementIds.forEach(id => {
         const el = document.getElementById(id);
@@ -257,7 +258,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return {
                     id,
                     title,
-                    help: container?.querySelector('.help-tooltip')?.dataset.tooltip || "Veuillez saisir la valeur pour ce champ."
+                    help: container?.querySelector('.help-tooltip')?.dataset.tooltip || "Veuillez saisir la valeur pour ce champ.",
+                    status: 'pending' // Initial status
                 };
             }).filter(Boolean);
 
@@ -270,10 +272,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         start() {
             if (this.steps.length === 0 || !elements['assistant-modal']) return;
-            this.currentStepIndex = 0;
+
+            // Initialize status for each step based on current form values
+            this.steps.forEach(step => {
+                const element = elements[step.id];
+                step.status = (element && element.value.trim() !== '') ? 'answered' : 'pending';
+            });
+
+            // Find the first step that is not 'answered'
+            let firstUnansweredIndex = this.steps.findIndex(step => step.status !== 'answered');
+            this.currentStepIndex = (firstUnansweredIndex !== -1) ? firstUnansweredIndex : 0;
+
             this.currentClonedInput = null;
-            elements['assistant-next-btn'].disabled = false;
-            elements['assistant-prev-btn'].disabled = false;
             elements['assistant-modal'].style.display = 'flex';
             this.renderStep();
         },
@@ -294,8 +304,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         },
+
+        renderProgressBar() {
+            const progressBar = elements['assistant-progress-bar'];
+            if (!progressBar) return;
+
+            progressBar.innerHTML = '';
+            this.steps.forEach((step, index) => {
+                const dot = document.createElement('div');
+                dot.className = `progress-dot ${step.status}`;
+                dot.title = step.title;
+                if (index === this.currentStepIndex) {
+                    dot.classList.add('current');
+                }
+                dot.addEventListener('click', () => {
+                    this.updateOriginalInput();
+                    this.currentStepIndex = index;
+                    this.renderStep();
+                });
+                progressBar.appendChild(dot);
+            });
+        },
         
         renderStep() {
+            this.renderProgressBar();
+            
             const step = this.steps[this.currentStepIndex];
             const originalElement = elements[step.id];
             
@@ -318,7 +351,26 @@ document.addEventListener('DOMContentLoaded', () => {
             clonedElement.focus();
 
             elements['assistant-prev-btn'].style.display = this.currentStepIndex > 0 ? 'inline-block' : 'none';
-            elements['assistant-next-btn'].textContent = this.currentStepIndex === this.steps.length - 1 ? "Terminer" : "Suivant";
+            elements['assistant-next-btn'].textContent = this.findNextStep(true) === -1 ? "Terminer" : "Suivant";
+        },
+
+        findNextStep(loop = true) {
+            // Search from current position to the end
+            for (let i = this.currentStepIndex + 1; i < this.steps.length; i++) {
+                if (this.steps[i].status !== 'answered') {
+                    return i;
+                }
+            }
+            // If loop is true, search from the beginning to the current position
+            if (loop) {
+                for (let i = 0; i < this.currentStepIndex; i++) {
+                    if (this.steps[i].status !== 'answered') {
+                        return i;
+                    }
+                }
+            }
+            // If no steps found
+            return -1;
         },
 
         nextStep() {
@@ -331,26 +383,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentElement.classList.add('input-error');
                 return;
             }
-            currentElement.classList.remove('input-error');
             
+            currentElement.classList.remove('input-error');
+            this.steps[this.currentStepIndex].status = 'answered';
             this.updateOriginalInput();
 
-            if (this.currentStepIndex === this.steps.length - 1) {
+            const nextIndex = this.findNextStep();
+
+            if (nextIndex !== -1) {
+                this.currentStepIndex = nextIndex;
+                this.renderStep();
+            } else {
                 this.close();
                 alert("La saisie est maintenant terminée. Vous pouvez cliquer sur 'Calculer' pour obtenir votre estimation.");
-            } else {
-                this.currentStepIndex++;
-                this.renderStep();
             }
         },
 
         skipStep() {
+            const currentStep = this.steps[this.currentStepIndex];
+            if (currentStep.status !== 'answered') {
+                currentStep.status = 'skipped';
+            }
+            
             this.updateOriginalInput();
-            if (this.currentStepIndex < this.steps.length - 1) {
-                this.currentStepIndex++;
+            const nextIndex = this.findNextStep();
+
+            if (nextIndex !== -1) {
+                this.currentStepIndex = nextIndex;
                 this.renderStep();
             } else {
-                this.close();
+                 const firstSkipped = this.steps.findIndex(s => s.status === 'skipped');
+                 if (firstSkipped !== -1) {
+                    this.currentStepIndex = firstSkipped;
+                    this.renderStep();
+                 } else {
+                    this.close();
+                 }
             }
         },
 
