@@ -656,33 +656,27 @@ select {
     section {
         margin-bottom: 10px; page-break-inside: avoid;
     }
-    .form-row {
-        display: flex !important; flex-direction: row !important; justify-content: space-between; align-items: center; padding: 2px 0; margin-bottom: 0 !important; border-bottom: 1px solid #eee;
-    }
-    .form-row label {
-        flex-basis: auto !important; margin-bottom: 0 !important; font-weight: bold; flex: 1;
-    }
     input[type="text"], select {
         -webkit-appearance: none; -moz-appearance: none; appearance: none;
         border: none; padding: 0; margin: 0; font-size: 10pt; width: auto; background: transparent; text-align: right; color: #000; box-shadow: none; font-family: inherit; flex: 1;
     }
     select { pointer-events: none; }
-    .determinant-table, .reduction-breakdown-table {
+    .personal-info-table, .determinant-table, .reduction-breakdown-table {
         display: table !important; width: 100% !important; border-collapse: collapse !important; margin-top: 5px;
     }
-    .determinant-table thead, .reduction-breakdown-table thead { display: table-header-group !important; }
-    .determinant-table tbody, .reduction-breakdown-table tbody, .determinant-table tfoot, .reduction-breakdown-table tfoot { display: table-row-group !important; }
-    .determinant-table tr, .reduction-breakdown-table tr { display: table-row !important; page-break-inside: avoid; border: none !important; }
-    .determinant-table th, .determinant-table td, .reduction-breakdown-table th, .reduction-breakdown-table td {
+    .personal-info-table thead, .determinant-table thead, .reduction-breakdown-table thead { display: table-header-group !important; }
+    .personal-info-table tbody, .determinant-table tbody, .reduction-breakdown-table tbody, .personal-info-table tfoot, .determinant-table tfoot, .reduction-breakdown-table tfoot { display: table-row-group !important; }
+    .personal-info-table tr, .determinant-table tr, .reduction-breakdown-table tr { display: table-row !important; page-break-inside: avoid; border: none !important; }
+    .personal-info-table th, .personal-info-table td, .determinant-table th, .determinant-table td, .reduction-breakdown-table th, .reduction-breakdown-table td {
         display: table-cell !important; width: auto !important; border: 1px solid #ccc !important; padding: 2px 6px !important; font-size: 9pt !important; vertical-align: middle !important; text-align: left !important; background: transparent !important; justify-content: initial !important; align-items: initial !important;
     }
-    .determinant-table td:before, .reduction-breakdown-table td:before { content: "" !important; display: none !important; }
-    .determinant-table th, .reduction-breakdown-table th { font-weight: bold !important; background-color: #f0f0f0 !important; color: #000 !important; }
-    .determinant-table td input[type="text"] {
+    .personal-info-table td:before, .determinant-table td:before, .reduction-breakdown-table td:before { content: "" !important; display: none !important; }
+    .personal-info-table th, .determinant-table th, .reduction-breakdown-table th { font-weight: bold !important; background-color: #f0f0f0 !important; color: #000 !important; }
+    .personal-info-table td input[type="text"], .personal-info-table td select, .determinant-table td input[type="text"] {
         padding: 2px 6px !important; width: 100% !important; max-width: none !important; box-sizing: border-box !important; text-align: right !important;
     }
     .determinant-table .determinant-value, .determinant-table .total-value, .determinant-table tfoot .total-label, .reduction-breakdown-table td, .reduction-breakdown-table th { text-align: right !important; }
-    .determinant-table td:first-child, .determinant-table th:first-child, .reduction-breakdown-table td:first-child, .reduction-breakdown-table th:first-child { text-align: left !important; }
+    .personal-info-table td:first-child, .personal-info-table th:first-child, .determinant-table td:first-child, .determinant-table th:first-child, .reduction-breakdown-table td:first-child, .reduction-breakdown-table th:first-child { text-align: left !important; }
     .determinant-value, .total-value { background-color: #f9f9f9 !important; }
     .cell-help { text-align: center !important; }
     .result-box { border: 1px solid #ccc; padding: 10px; background: transparent; }
