@@ -355,6 +355,6 @@
   En cas de divergence,
   <strong>les dispositions légales et les décisions des autorités cantonales font foi</strong>.
 </p>
-
+<p align="center">© 2026 – Calculateur développé par Jacques Morand</p>
 
 </div>
