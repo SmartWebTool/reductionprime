@@ -1,0 +1,21 @@
+{
+  "name": "Calculateur de réduction de primes",
+  "short_name": "Prime-Calc",
+  "description": "Calculateur pour estimer la réduction des primes d'assurance-maladie pour le canton de Fribourg.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#005a9e",
+  "icons": [
+    {
+      "src": "IconCalculatorPrimeReduction.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "IconCalculatorPrimeReduction.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
