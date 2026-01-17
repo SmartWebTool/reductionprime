@@ -1,4 +1,8 @@
 /* General Styles */
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
 :root {
     --primary-color: #005a9e;
     --light-gray: #f4f4f4;
@@ -551,87 +555,53 @@ select {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    body {
+        padding: 10px 5px;
+    }
+    .container {
+        padding: 15px;
+    }
+    header h1 {
+        font-size: 1.6em;
+    }
+    .input-section h2, .results-section h2 {
+        font-size: 1.3em;
+    }
+
+    /* Stack form rows */
     .form-row {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
+        gap: 5px;
     }
-
     .form-row label {
-        flex-basis: auto;
         margin-bottom: 5px;
     }
-
-    /* Transform table for mobile */
-    .determinant-table thead { display: none; }
-    .determinant-table, .determinant-table tbody, .determinant-table tr, .determinant-table td {
-        display: block;
+    
+    /* Stack banner content */
+    .banner-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .unified-banner button {
         width: 100%;
+        text-align: center;
     }
-    .determinant-table tr {
-        margin-bottom: 15px;
-        border: 2px solid var(--primary-color);
-        border-radius: 5px;
-        padding: 5px;
-    }
-    .determinant-table td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border: none;
-        border-bottom: 1px solid var(--light-gray);
-        padding: 8px 0;
-    }
-    .determinant-table td:last-child { border-bottom: none; }
-    .determinant-table td:before {
-        content: attr(data-label);
-        font-weight: bold;
-        padding-right: 10px;
-    }
-    .determinant-table td:nth-of-type(1):before { content: "Rubrique:"; }
-    .determinant-table td:nth-of-type(2):before { content: "Code:"; }
-    .determinant-table td:nth-of-type(3):before { content: "Votre Valeur:"; }
-    .determinant-table td:nth-of-type(4):before { content: "Op.:"; }
-    .determinant-table td:nth-of-type(5):before { content: "Valeur Déterminante:"; }
-    .determinant-table td:nth-of-type(6):before { content: ""; }
-    .determinant-table td input { max-width: 120px; }
-    .determinant-table tfoot tr { border: none; }
-    .determinant-table tfoot td {
-        border-top: 2px solid var(--primary-color);
-        margin-top: 10px;
-    }
-    .determinant-table tfoot td:before { content: ""; }
 
-    /* Responsive for breakdown table */
-    .reduction-breakdown-table thead { display: none; }
-    .reduction-breakdown-table, .reduction-breakdown-table tbody, .reduction-breakdown-table tr, .reduction-breakdown-table td {
-        display: block;
-        width: 100%;
-    }
-    .reduction-breakdown-table tr {
-        margin-bottom: 15px;
-        border: 2px solid var(--primary-color);
+    /* Make tables scrollable */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid var(--medium-gray);
         border-radius: 5px;
-        padding: 5px;
+        margin: 20px 0;
     }
-    .reduction-breakdown-table td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    .determinant-table, .reduction-breakdown-table {
+        margin-top: 0;
         border: none;
-        border-bottom: 1px solid var(--light-gray);
-        padding: 8px 0;
+        min-width: 600px;
     }
-    .reduction-breakdown-table td:last-child { border-bottom: none; }
-    .reduction-breakdown-table td:nth-of-type(1):before { content: "Groupe:"; }
-    .reduction-breakdown-table td:nth-of-type(2):before { content: "Prime Moyenne:"; }
-    .reduction-breakdown-table td:nth-of-type(3):before { content: "Pourcentage:"; }
-    .reduction-breakdown-table td:nth-of-type(4):before { content: "Réduction:"; }
-    .reduction-breakdown-table tfoot tr { border: none; }
-    .reduction-breakdown-table tfoot td {
-        border-top: 2px solid var(--primary-color);
-        margin-top: 10px;
-    }
-    .reduction-breakdown-table tfoot td:before { content: ""; }
 }
 
 /* Print-specific Styles */

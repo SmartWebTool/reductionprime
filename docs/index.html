@@ -119,117 +119,119 @@
                     <h2><span class="section-number">2</span>Calcul du revenu déterminant</h2>
                     <p class="section-intro">Saisissez les montants de votre avis de taxation datant de 2 ans (par exemple avis de taxation 2024 pour demande de réduction 2026). Pour chaque champ, la valeur utilisée pour le calcul (valeur déterminante) sera affichée.</p>
                     
-                    <table class="determinant-table">
-                        <thead>
-                            <tr>
-                                <th>Rubrique</th>
-                                <th>Code</th>
-                                <th>Votre Valeur (CHF)</th>
-                                <th>Op.</th>
-                                <th>Valeur Déterminante</th>
-                                <th>Aide</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Revenu Net -->
-                            <tr data-step-id="revenu-net">
-                                <td>Revenu net</td>
-                                <td>4.910</td>
-                                <td class="input-wrapper"><input type="text" id="revenu-net" placeholder="Revenu net avis de taxation (code 4.910)"></td>
-                                <td class="operator plus">+</td>
-                                <td class="determinant-value" id="determinant-revenu-net">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez le revenu net selon votre avis de taxation selon code 4.910, exemple: 40000.">?</span></td>
-                            </tr>
-                            <!-- Primes caisse-maladie et accidents -->
-                            <tr data-step-id="caisse-maladie">
-                                <td>Primes caisse-maladie et accidents</td>
-                                <td>4.110</td>
-                                <td class="input-wrapper"><input type="text" id="caisse-maladie" placeholder="Primes Maladie / Accidents (code 4.110)"></td>
-                                <td class="operator plus">+</td>
-                                <td class="determinant-value" id="determinant-caisse-maladie">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez le montant de vos primes LAMal et LAA selon code 4.110.">?</span></td>
-                            </tr>
-                            <!-- Réduction de prime -->
-                            <tr data-step-id="reduction-prime">
-                                <td>Réduction de prime</td>
-                                <td>4.115</td>
-                                <td class="input-wrapper"><input type="text" id="reduction-prime" placeholder="Réduction de prime (code 4.115)"></td>
-                                <td class="operator minus">-</td>
-                                <td class="determinant-value" id="determinant-reduction-prime">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez le montant de la réduction de prime déjà reçue ou attendue selon code 4.115, exemple: 0 si aucune réduction n'a été reçue. Ce montant sera déduit du revenu déterminant.">?</span></td>
-                            </tr>
-                            <!-- Autres primes et cotisations (pilier 3b) -->
-                            <tr data-step-id="autres-primes">
-                                <td>Autres primes et cotisations (3b)</td>
-                                <td>4.120</td>
-                                <td class="input-wrapper"><input type="text" id="autres-primes" placeholder="Autres primes (code 4.120)"></td>
-                                <td class="operator plus">+</td>
-                                <td class="determinant-value" id="determinant-autres-primes">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les primes d'assurances vie et rentes (pilier 3b) selon code 4.120, exemple: 0 si aucune prime n'est payée.">?</span></td>
-                            </tr>
-                            <!-- Prévoyance liée (pilier 3a) conjoint -->
-                            <tr data-step-id="prevoyance-conjoint">
-                                <td>Prévoyance liée (3a) conjoint</td>
-                                <td>4.130</td>
-                                <td class="input-wrapper"><input type="text" id="prevoyance-conjoint" placeholder="Prévoyance liée conjoint (code 4.130)"></td>
-                                <td class="operator plus">+</td>
-                                <td class="determinant-value" id="determinant-prevoyance-conjoint">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les cotisations au 3ème pilier A pour le premier conjoint selon code 4.130.">?</span></td>
-                            </tr>
-                            <!-- Prévoyance liée (pilier 3a) conjointe -->
-                            <tr data-step-id="prevoyance-conjointe">
-                                <td>Prévoyance liée (3a) conjointe</td>
-                                <td>4.130</td>
-                                <td class="input-wrapper"><input type="text" id="prevoyance-conjointe" placeholder="Prévoyance liée conjointe (code 4.130)"></td>
-                                <td class="operator plus">+</td>
-                                <td class="determinant-value" id="determinant-prevoyance-conjointe">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les cotisations au 3ème pilier A pour la conjointe selon code 4.130, exemple: 0 si aucune cotisation n'est payée.">?</span></td>
-                            </tr>
-                            <!-- Rachat d'années d'assurance (2ème pilier) -->
-                            <tr data-step-id="rachat-assurance">
-                                <td>Rachat d'années d'assurance (2e pilier)</td>
-                                <td>4.140</td>
-                                <td class="input-wrapper"><input type="text" id="rachat-assurance" placeholder="Rachat 2e pilier (code 4.140)"></td>
-                                <td class="operator plus">+</td>
-                                <td class="determinant-value" id="determinant-rachat-assurance">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les rachats d'années LPP selon code 4.140, exemple: 0 si aucun rachat n'a été effectué. Seule la part excédant 15'000 CHF sera ajoutée.">?</span></td>
-                            </tr>
-                            <!-- Intérêts passifs privés -->
-                            <tr data-step-id="interets-passifs">
-                                <td>Intérêts passifs privés</td>
-                                <td>4.210</td>
-                                <td class="input-wrapper"><input type="text" id="interets-passifs" placeholder="Intérêts passifs (code 4.210)"></td>
-                                <td class="operator plus">+</td>
-                                <td class="determinant-value" id="determinant-interets-passifs">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les intérêts passifs selon code 4.210, exemple: 1750. Seule la part des intérêts qui dépasse 30'000 CHF sera ajoutée.">?</span></td>
-                            </tr>
-                            <!-- Frais d'entretien d'immeubles privés -->
-                            <tr data-step-id="frais-immeubles">
-                                <td>Frais d'entretien d'immeubles</td>
-                                <td>4.310</td>
-                                <td class="input-wrapper"><input type="text" id="frais-immeubles" placeholder="Frais immeubles (code 4.310)"></td>
-                                <td class="operator plus">+</td>
-                                <td class="determinant-value" id="determinant-frais-immeubles">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les frais d'entretien des immeubles selon code 4.310, exemple: 3450. Seule la part des frais qui dépasse 15'000 CHF sera ajoutée.">?</span></td>
-                            </tr>
-                            <!-- Fortune imposable -->
-                            <tr data-step-id="fortune-imposable">
-                                <td>Fortune imposable</td>
-                                <td>7.910</td>
-                                <td class="input-wrapper"><input type="text" id="fortune-imposable" placeholder="Fortune imposable (code 7.910)"></td>
-                                <td class="operator plus">+</td>
-                                <td class="determinant-value" id="determinant-fortune-imposable">0 CHF</td>
-                                <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez la fortune imposable selon code 7.910, exemple: 25000 en cas de fortune ou -35000 en cas de dette. Seul 1/20ème de la fortune > 0 CHF sera ajouté. Une fortune négative est comptée comme 0.">?</span></td>
-                            </tr>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="4" class="total-label">Total du Revenu Déterminant</td>
-                                <td class="total-value" id="total-determinant-sum">0 CHF</td>
-                                <td class="cell-help"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                    <div class="table-container">
+                        <table class="determinant-table">
+                            <thead>
+                                <tr>
+                                    <th>Rubrique</th>
+                                    <th>Code</th>
+                                    <th>Votre Valeur (CHF)</th>
+                                    <th>Op.</th>
+                                    <th>Valeur Déterminante</th>
+                                    <th>Aide</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Revenu Net -->
+                                <tr data-step-id="revenu-net">
+                                    <td>Revenu net</td>
+                                    <td>4.910</td>
+                                    <td class="input-wrapper"><input type="text" id="revenu-net" placeholder="Revenu net avis de taxation (code 4.910)"></td>
+                                    <td class="operator plus">+</td>
+                                    <td class="determinant-value" id="determinant-revenu-net">0 CHF</td>
+                                    <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez le revenu net selon votre avis de taxation selon code 4.910, exemple: 40000.">?</span></td>
+                                </tr>
+                                <!-- Primes caisse-maladie et accidents -->
+                                <tr data-step-id="caisse-maladie">
+                                    <td>Primes caisse-maladie et accidents</td>
+                                    <td>4.110</td>
+                                    <td class="input-wrapper"><input type="text" id="caisse-maladie" placeholder="Primes Maladie / Accidents (code 4.110)"></td>
+                                    <td class="operator plus">+</td>
+                                    <td class="determinant-value" id="determinant-caisse-maladie">0 CHF</td>
+                                    <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez le montant de vos primes LAMal et LAA selon code 4.110.">?</span></td>
+                                </tr>
+                                <!-- Réduction de prime -->
+                                <tr data-step-id="reduction-prime">
+                                    <td>Réduction de prime</td>
+                                    <td>4.115</td>
+                                    <td class="input-wrapper"><input type="text" id="reduction-prime" placeholder="Réduction de prime (code 4.115)"></td>
+                                    <td class="operator minus">-</td>
+                                    <td class="determinant-value" id="determinant-reduction-prime">0 CHF</td>
+                                    <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez le montant de la réduction de prime déjà reçue ou attendue selon code 4.115, exemple: 0 si aucune réduction n'a été reçue. Ce montant sera déduit du revenu déterminant.">?</span></td>
+                                </tr>
+                                <!-- Autres primes et cotisations (pilier 3b) -->
+                                <tr data-step-id="autres-primes">
+                                    <td>Autres primes et cotisations (3b)</td>
+                                    <td>4.120</td>
+                                    <td class="input-wrapper"><input type="text" id="autres-primes" placeholder="Autres primes (code 4.120)"></td>
+                                    <td class="operator plus">+</td>
+                                    <td class="determinant-value" id="determinant-autres-primes">0 CHF</td>
+                                    <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les primes d'assurances vie et rentes (pilier 3b) selon code 4.120, exemple: 0 si aucune prime n'est payée.">?</span></td>
+                                </tr>
+                                <!-- Prévoyance liée (pilier 3a) conjoint -->
+                                <tr data-step-id="prevoyance-conjoint">
+                                    <td>Prévoyance liée (3a) conjoint</td>
+                                    <td>4.130</td>
+                                    <td class="input-wrapper"><input type="text" id="prevoyance-conjoint" placeholder="Prévoyance liée conjoint (code 4.130)"></td>
+                                    <td class="operator plus">+</td>
+                                    <td class="determinant-value" id="determinant-prevoyance-conjoint">0 CHF</td>
+                                    <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les cotisations au 3ème pilier A pour le premier conjoint selon code 4.130.">?</span></td>
+                                </tr>
+                                <!-- Prévoyance liée (pilier 3a) conjointe -->
+                                <tr data-step-id="prevoyance-conjointe">
+                                    <td>Prévoyance liée (3a) conjointe</td>
+                                    <td>4.130</td>
+                                    <td class="input-wrapper"><input type="text" id="prevoyance-conjointe" placeholder="Prévoyance liée conjointe (code 4.130)"></td>
+                                    <td class="operator plus">+</td>
+                                    <td class="determinant-value" id="determinant-prevoyance-conjointe">0 CHF</td>
+                                    <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les cotisations au 3ème pilier A pour la conjointe selon code 4.130, exemple: 0 si aucune cotisation n'est payée.">?</span></td>
+                                </tr>
+                                <!-- Rachat d'années d'assurance (2ème pilier) -->
+                                <tr data-step-id="rachat-assurance">
+                                    <td>Rachat d'années d'assurance (2e pilier)</td>
+                                    <td>4.140</td>
+                                    <td class="input-wrapper"><input type="text" id="rachat-assurance" placeholder="Rachat 2e pilier (code 4.140)"></td>
+                                    <td class="operator plus">+</td>
+                                    <td class="determinant-value" id="determinant-rachat-assurance">0 CHF</td>
+                                    <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les rachats d'années LPP selon code 4.140, exemple: 0 si aucun rachat n'a été effectué. Seule la part excédant 15'000 CHF sera ajoutée.">?</span></td>
+                                </tr>
+                                <!-- Intérêts passifs privés -->
+                                <tr data-step-id="interets-passifs">
+                                    <td>Intérêts passifs privés</td>
+                                    <td>4.210</td>
+                                    <td class="input-wrapper"><input type="text" id="interets-passifs" placeholder="Intérêts passifs (code 4.210)"></td>
+                                    <td class="operator plus">+</td>
+                                    <td class="determinant-value" id="determinant-interets-passifs">0 CHF</td>
+                                    <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les intérêts passifs selon code 4.210, exemple: 1750. Seule la part des intérêts qui dépasse 30'000 CHF sera ajoutée.">?</span></td>
+                                </tr>
+                                <!-- Frais d'entretien d'immeubles privés -->
+                                <tr data-step-id="frais-immeubles">
+                                    <td>Frais d'entretien d'immeubles</td>
+                                    <td>4.310</td>
+                                    <td class="input-wrapper"><input type="text" id="frais-immeubles" placeholder="Frais immeubles (code 4.310)"></td>
+                                    <td class="operator plus">+</td>
+                                    <td class="determinant-value" id="determinant-frais-immeubles">0 CHF</td>
+                                    <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez les frais d'entretien des immeubles selon code 4.310, exemple: 3450. Seule la part des frais qui dépasse 15'000 CHF sera ajoutée.">?</span></td>
+                                </tr>
+                                <!-- Fortune imposable -->
+                                <tr data-step-id="fortune-imposable">
+                                    <td>Fortune imposable</td>
+                                    <td>7.910</td>
+                                    <td class="input-wrapper"><input type="text" id="fortune-imposable" placeholder="Fortune imposable (code 7.910)"></td>
+                                    <td class="operator plus">+</td>
+                                    <td class="determinant-value" id="determinant-fortune-imposable">0 CHF</td>
+                                    <td class="cell-help"><span class="help-tooltip" data-tooltip="Saisissez la fortune imposable selon code 7.910, exemple: 25000 en cas de fortune ou -35000 en cas de dette. Seul 1/20ème de la fortune > 0 CHF sera ajouté. Une fortune négative est comptée comme 0.">?</span></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" class="total-label">Total du Revenu Déterminant</td>
+                                    <td class="total-value" id="total-determinant-sum">0 CHF</td>
+                                    <td class="cell-help"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                     <div class="calculate-button-container">
                         <button id="calculate-btn">Calculer</button>
                     </div>
@@ -276,22 +278,24 @@
                          <div class="result-item final-result">
                             <span class="result-label">Estimation de la réduction (annuel):</span>
                          </div>
-                         <table class="reduction-breakdown-table">
-                            <thead>
-                                <tr>
-                                    <th>Groupe</th>
-                                    <th>Prime Moyenne (mensuel)</th>
-                                    <th>Pourcentage</th>
-                                    <th>Réduction (annuel)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="breakdown-body">
-                                <!-- Rows will be generated by script.js -->
-                            </tbody>
-                            <tfoot id="breakdown-foot">
-                                <!-- Total row will be generated by script.js -->
-                            </tfoot>
-                         </table>
+                         <div class="table-container">
+                            <table class="reduction-breakdown-table">
+                                <thead>
+                                    <tr>
+                                        <th>Groupe</th>
+                                        <th>Prime Moyenne (mensuel)</th>
+                                        <th>Pourcentage</th>
+                                        <th>Réduction (annuel)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="breakdown-body">
+                                    <!-- Rows will be generated by script.js -->
+                                </tbody>
+                                <tfoot id="breakdown-foot">
+                                    <!-- Total row will be generated by script.js -->
+                                </tfoot>
+                            </table>
+                         </div>
                     </div>
                     <p class="disclaimer">Ce calcul est une estimation. La décision officielle est communiquée par la Caisse de compensation du canton de Fribourg.</p>
                     <p class="disclaimer">© 2026 – Calculateur développé par Jacques Morand</p>
