@@ -551,8 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     clearValidationErrors();
                     const year = elements['annee-calcul'].value;
                     if (!await loadDataForYear(year)) {
-                        alert(`Données non trouvées pour l'année ${year}. Retour à ${DEFAULT_YEAR}.`);
-                        elements['annee-calcul'].value = DEFAULT_YEAR;
+                        alert(`Données non trouvées pour l'année ${year}. Le calcul sera effectué avec les données de base de ${DEFAULT_YEAR}.`);
                         await loadDataForYear(DEFAULT_YEAR);
                     }
                     clearResults();
