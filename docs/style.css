@@ -573,9 +573,10 @@ select {
         flex-direction: column;
         align-items: stretch;
         gap: 5px;
+        margin-bottom: 10px; /* Reduce vertical space between form rows */
     }
     .form-row label {
-        margin-bottom: 5px;
+        margin-bottom: 0; /* Remove margin from label, relying on gap for spacing */
     }
     
     /* Stack banner content */
