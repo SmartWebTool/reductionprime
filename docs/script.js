@@ -87,12 +87,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const calculateDeterminantIncome = () => {
         const determinants = {
-            revenuNet: parseInput('revenu-net'), caisseMaladie: parseInput('caisse-maladie'),
-            reductionPrime: -parseInput('reduction-prime'), autresPrimes: parseInput('autres-primes'),
-            prevoyanceConjoint: parseInput('prevoyance-conjoint'), prevoyanceConjointe: parseInput('prevoyance-conjointe'),
-            rachatAssurance: Math.max(0, parseInput('rachat-assurance') - (csvData.config.franchise_rachat_lpp || 0)),
-            interetsPassifs: Math.max(0, parseInput('interets-passifs') - (csvData.config.franchise_interets_passifs || 0)),
-            fraisImmeubles: Math.max(0, parseInput('frais-immeubles') - (csvData.config.franchise_frais_immeubles || 0)),
+            revenuNet: parseInput('revenu-net'),
+            caisseMaladie: Math.abs(parseInput('caisse-maladie')),
+            reductionPrime: -parseInput('reduction-prime'),
+            autresPrimes: Math.abs(parseInput('autres-primes')),
+            prevoyanceConjoint: Math.abs(parseInput('prevoyance-conjoint')),
+            prevoyanceConjointe: Math.abs(parseInput('prevoyance-conjointe')),
+            rachatAssurance: Math.max(0, Math.abs(parseInput('rachat-assurance')) - (csvData.config.franchise_rachat_lpp || 0)),
+            interetsPassifs: Math.max(0, Math.abs(parseInput('interets-passifs')) - (csvData.config.franchise_interets_passifs || 0)),
+            fraisImmeubles: Math.max(0, Math.abs(parseInput('frais-immeubles')) - (csvData.config.franchise_frais_immeubles || 0)),
             fortuneImposable: Math.max(0, parseInput('fortune-imposable')) / 20,
         };
 
