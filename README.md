@@ -108,26 +108,28 @@
 
   <hr>
 
-  <h3>Accès officiel au calculateur</h3>
+  <div class="github-only">
+    <h3>Accès officiel au calculateur</h3>
 
-  <p>
-    Pour éviter toute confusion ou tentative de spoofing,
-    vous pouvez copier manuellement l’adresse officielle suivante
-    dans la barre de votre navigateur :
-  </p>
+    <p>
+      Pour éviter toute confusion ou tentative de spoofing,
+      vous pouvez copier manuellement l’adresse officielle suivante
+      dans la barre de votre navigateur :
+    </p>
 
-  <p>
-    <code>https://smartwebtool.github.io/reductionprime/</code>
-  </p>
+    <p>
+      <code>https://smartwebtool.github.io/reductionprime/</code>
+    </p>
 
-  <p align="left">
-    Vous pouvez également y accéder via l’icône du calculateur:<br>
-      <a href="https://smartwebtool.github.io/reductionprime/" target="_blank" rel="noopener noreferrer">
-        <img src="IconCalculatorPrimeReduction.png" alt="Calculateur de réduction de prime" width="300">
-      </a>
-  </p>
+    <p align="left">
+      Vous pouvez également y accéder via l’icône du calculateur:<br>
+        <a href="https://smartwebtool.github.io/reductionprime/" target="_blank" rel="noopener noreferrer">
+          <img src="IconCalculatorPrimeReduction.png" alt="Calculateur de réduction de prime" width="300">
+        </a>
+    </p>
 
-  <hr>
+    <hr>
+  </div>
 
   <h3>Cadre légal et avertissement</h3>
 
