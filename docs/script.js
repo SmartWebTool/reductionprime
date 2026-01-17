@@ -338,8 +338,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const markdown = await response.text();
-                this.readmeContent = this.parseMarkdown(markdown);
+                let markdown = await response.text();
+
+                // Remove the GitHub-only section using a regular expression
+                const githubOnlyRegex = /<!--\s*GITHUB_ONLY_START\s*-->[\s\S]*?<!--\s*GITHUB_ONLY_END\s*-->/g;
+                const cleanedMarkdown = markdown.replace(githubOnlyRegex, '');
+
+                this.readmeContent = this.parseMarkdown(cleanedMarkdown);
                 elements['help-modal-body'].innerHTML = this.readmeContent;
             } catch (error) {
                 console.error("Error fetching README:", error);
