@@ -109,6 +109,43 @@ select {
     flex-grow: 1;
 }
 
+/* New table for personal info */
+.personal-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.personal-info-table th, .personal-info-table td {
+    padding: 8px 10px;
+    border: 1px solid var(--medium-gray);
+    text-align: left;
+    vertical-align: middle;
+}
+
+.personal-info-table thead {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.personal-info-table th {
+    font-weight: bold;
+}
+
+.personal-info-table td.input-wrapper {
+    padding: 0;
+}
+
+.personal-info-table td.input-wrapper input,
+.personal-info-table td.input-wrapper select {
+    padding: 8px 10px;
+    border: none;
+    border-radius: 0;
+    width: 100%;
+    background-color: transparent;
+}
+
+
 /* Table-based layout for determinant calculation */
 .determinant-table {
     width: 100%;
@@ -568,17 +605,6 @@ select {
         font-size: 1.3em;
     }
 
-    /* Stack form rows */
-    .form-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 5px;
-        margin-bottom: 10px; /* Reduce vertical space between form rows */
-    }
-    .form-row label {
-        margin-bottom: 0; /* Remove margin from label, relying on gap for spacing */
-    }
-    
     /* Stack banner content */
     .banner-row {
         flex-direction: column;

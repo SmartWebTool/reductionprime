@@ -62,55 +62,80 @@
                 <!-- Section Situation Personnelle -->
                 <section class="input-section">
                     <h2><span class="section-number">1</span>Situation Personnelle</h2>
-                    <div class="form-row" data-step-id="annee-calcul">
-                        <label for="annee-calcul">Année de calcul</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="annee-calcul" value="2026" placeholder="Année de calcul" min="2020">
-                            <span class="help-tooltip" data-tooltip="Saisissez l'année pour laquelle la réduction sera calculée, exemple: 2026. Les données de base (primes, etc.) seront chargées pour cette année.">?</span>
-                        </div>
-                    </div>
-                    <div class="form-row" data-step-id="statut-civil">
-                        <label for="statut-civil">Statut civil</label>
-                        <div class="input-wrapper">
-                            <select id="statut-civil">
-                                <option value="" disabled selected>Sélectionnez...</option>
-                                <option value="single">Célibataire / Divorcé(e) / Veuf(ve) / Séparé(e)</option>
-                                <option value="married">Couple marié</option>
-                            </select>
-                            <span class="help-tooltip" data-tooltip="Sélectionnez votre état civil actuel.">?</span>
-                        </div>
-                    </div>
-                    <div class="form-row" data-step-id="region">
-                        <label for="region">Région</label>
-                        <div class="input-wrapper">
-                            <select id="region">
-                                <option value="" disabled selected>Sélectionnez...</option>
-                                <option value="1">Région 1 (Sarine)</option>
-                                <option value="2">Région 2 (Autres districts)</option>
-                            </select>
-                            <span class="help-tooltip" data-tooltip="Sélectionnez votre région. La prime moyenne de base pour le calcul varie selon le district du domicile.">?</span>
-                        </div>
-                    </div>
-                    <div class="form-row" data-step-id="nombre-adultes">
-                        <label for="nombre-adultes">Nombre d'adultes (>25 ans)</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="nombre-adultes" placeholder="Nombre d'adultes" min="0">
-                            <span class="help-tooltip" data-tooltip="Saisissez le nombre d'adultes parents dans le ménage, exemple: 2.">?</span>
-                        </div>
-                    </div>
-                    <div class="form-row" data-step-id="nombre-jeunes">
-                        <label for="nombre-jeunes">Nombre de jeunes adultes en formation (19-25 ans)</label>
-                        <div class="input-wrapper">
-                             <input type="text" id="nombre-jeunes" placeholder="Nombre de jeunes adultes en formation" min="0">
-                            <span class="help-tooltip" data-tooltip="Saisissez le nombre de jeunes adultes en formation entre 19 et 25 ans, exemple: 0.">?</span>
-                        </div>
-                    </div>
-                    <div class="form-row" data-step-id="nombre-enfants">
-                        <label for="nombre-enfants">Nombre d'enfants (0-18 ans)</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="nombre-enfants" placeholder="Nombre d'enfants" min="0">
-                            <span class="help-tooltip" data-tooltip="Saisissez le nombre d'enfants jusqu'à 18 ans, exemple: 1.">?</span>
-                        </div>
+                    <div class="table-container">
+                        <table class="personal-info-table">
+                            <thead>
+                                <tr>
+                                    <th>Rubrique</th>
+                                    <th>Votre entrée</th>
+                                    <th>Aide</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Année de calcul</td>
+                                    <td class="input-wrapper">
+                                        <input type="text" id="annee-calcul" value="2026" placeholder="Année de calcul" min="2020">
+                                    </td>
+                                    <td class="cell-help">
+                                        <span class="help-tooltip" data-tooltip="Saisissez l'année pour laquelle la réduction sera calculée, exemple: 2026. Les données de base (primes, etc.) seront chargées pour cette année.">?</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Statut civil</td>
+                                    <td class="input-wrapper">
+                                        <select id="statut-civil">
+                                            <option value="" disabled selected>Sélectionnez...</option>
+                                            <option value="single">Célibataire / Divorcé(e) / Veuf(ve) / Séparé(e)</option>
+                                            <option value="married">Couple marié</option>
+                                        </select>
+                                    </td>
+                                    <td class="cell-help">
+                                        <span class="help-tooltip" data-tooltip="Sélectionnez votre état civil actuel.">?</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Région</td>
+                                    <td class="input-wrapper">
+                                        <select id="region">
+                                            <option value="" disabled selected>Sélectionnez...</option>
+                                            <option value="1">Région 1 (Sarine)</option>
+                                            <option value="2">Région 2 (Autres districts)</option>
+                                        </select>
+                                    </td>
+                                    <td class="cell-help">
+                                        <span class="help-tooltip" data-tooltip="Sélectionnez votre région. La prime moyenne de base pour le calcul varie selon le district du domicile.">?</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Nombre d'adultes (>25 ans)</td>
+                                    <td class="input-wrapper">
+                                        <input type="text" id="nombre-adultes" placeholder="Nombre d'adultes" min="0">
+                                    </td>
+                                    <td class="cell-help">
+                                        <span class="help-tooltip" data-tooltip="Saisissez le nombre d'adultes parents dans le ménage, exemple: 2.">?</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Nombre de jeunes adultes en formation (19-25 ans)</td>
+                                    <td class="input-wrapper">
+                                        <input type="text" id="nombre-jeunes" placeholder="Nombre de jeunes adultes en formation" min="0">
+                                    </td>
+                                    <td class="cell-help">
+                                        <span class="help-tooltip" data-tooltip="Saisissez le nombre de jeunes adultes en formation entre 19 et 25 ans, exemple: 0.">?</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Nombre d'enfants (0-18 ans)</td>
+                                    <td class="input-wrapper">
+                                        <input type="text" id="nombre-enfants" placeholder="Nombre d'enfants" min="0">
+                                    </td>
+                                    <td class="cell-help">
+                                        <span class="help-tooltip" data-tooltip="Saisissez le nombre d'enfants jusqu'à 18 ans, exemple: 1.">?</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </section>
 
